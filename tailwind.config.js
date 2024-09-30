@@ -10,8 +10,12 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        // Add 'Pacifico' and 'Playfair Display' to the font family options
+        brand: ["Pacifico", "cursive"], // for the brand name or special usage
+        body: ["Playfair Display", "serif"],
+
         sans: ["var(--font-sans)"],
-        mono: ["var(--font-mono)"],
+        mono: ["var(--font-mono)"], // for general body text
       },
     },
   },
