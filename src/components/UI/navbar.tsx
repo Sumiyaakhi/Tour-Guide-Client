@@ -21,8 +21,13 @@ import Image from "next/image";
 import img from "../../assets/travel logo.png";
 import { Button } from "@nextui-org/button";
 import { Avatar } from "@nextui-org/avatar";
+import { useUser } from "@/src/context/user.provider";
+import NavbarDropdown from "./NavbarDropdown";
+import { ThemeSwitch } from "../theme-switch";
 
 export const Navbar = () => {
+  const { user } = useUser();
+  console.log("user from navbar", user);
   const pathname = usePathname();
   console.log("pathname from the route", pathname); // Get current path
 
@@ -105,13 +110,18 @@ export const Navbar = () => {
         </ul>
 
         {/* login button */}
-        <div className="">
-          <Link href="/login">
-            <Button className="text-xl py-2  bg-green-600 hover:bg-white hover:text-green-600 transition duration-300 text-white">
-              Log In
-            </Button>
-          </Link>
-        </div>
+        {user?.email ? (
+          <NavbarDropdown />
+        ) : (
+          <div className="">
+            <Link href="/login">
+              <Button className="text-xl py-2  bg-green-600 hover:bg-white hover:text-green-600 transition duration-300 text-white">
+                Log In
+              </Button>
+            </Link>
+          </div>
+        )}
+        <ThemeSwitch />
       </NavbarContent>
 
       {/* Mobile Dropdown Menu */}

@@ -38,7 +38,7 @@
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
     "react-hooks/exhaustive-deps": "off",
-    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/interactive-supports-focus": "warn",
     "prettier/prettier": "off",
     "no-unused-vars": "off",
@@ -75,7 +75,7 @@
         "newlines-between": "always"
       }
     ],
-    "react/self-closing-comp": "warn",
+    "react/self-closing-comp": "off",
     "react/jsx-sort-props": [
       "off",
       {

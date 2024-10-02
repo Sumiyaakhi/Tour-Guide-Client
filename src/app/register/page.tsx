@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FaFacebookF, FaLinkedinIn, FaGoogle } from "react-icons/fa";
 import { motion } from "framer-motion"; // Import Framer Motion
+import { useUserRegistration } from "@/src/hooks/auth.hook";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useUser } from "@/src/context/user.provider";
 
 type FormData = {
   name: string;
@@ -17,6 +20,16 @@ type FormData = {
 };
 
 const Register = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { setIsLoading: userLoading } = useUser();
+  const redirect = searchParams.get("redirect");
+  const {
+    mutate: handleUserRegistration,
+    isPending,
+    isSuccess,
+  } = useUserRegistration();
+
   const {
     register,
     handleSubmit,
@@ -35,8 +48,20 @@ const Register = () => {
 
   const onSubmit = (data: FormData) => {
     console.log("Registered Data:", data);
+    handleUserRegistration(data);
+    userLoading(true);
     // Send data to your backend or API here
   };
+
+  useEffect(() => {
+    if (!isPending && isSuccess) {
+      if (redirect) {
+        router.push(redirect);
+      } else {
+        router.push("/");
+      }
+    }
+  }, [isPending, isSuccess]);
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-50">
