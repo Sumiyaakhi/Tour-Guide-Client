@@ -108,7 +108,7 @@ const AboutPage: React.FC = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex flex-wrap -mx-3">
             <div className="w-full md:w-1/2 px-3">
-              <label className="block text-gray-700">Name</label>
+              <label className=" text-gray-700">Name</label>
               <input
                 {...register("name", { required: true })}
                 className="mt-2 p-2 w-full border rounded-md"

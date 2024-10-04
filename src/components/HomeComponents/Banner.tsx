@@ -1,7 +1,7 @@
 const Banner: React.FC = () => {
   return (
     <div
-      className="relative w-full h-screen bg-cover bg-center bg-no-repeat"
+      className="relative w-full h-screen md:mt-20 bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: "url(https://www.smarttrip.it/assets/home_1.jpg)",
       }}

@@ -8,19 +8,15 @@ import {
   NavbarItem,
   NavbarMenuItem,
 } from "@nextui-org/navbar";
-import { Kbd } from "@nextui-org/kbd";
 import { Link } from "@nextui-org/link";
-import { Input } from "@nextui-org/input";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
 import { usePathname } from "next/navigation"; // Use usePathname for route detection
 import { siteConfig } from "@/src/config/site";
-import { SearchIcon } from "@/src/components/icons";
 import Image from "next/image";
 import img from "../../assets/travel logo.png";
 import { Button } from "@nextui-org/button";
-import { Avatar } from "@nextui-org/avatar";
 import { useUser } from "@/src/context/user.provider";
 import NavbarDropdown from "./NavbarDropdown";
 import { ThemeSwitch } from "../theme-switch";
@@ -31,27 +27,6 @@ export const Navbar = () => {
   const pathname = usePathname();
   console.log("pathname from the route", pathname); // Get current path
 
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
-
   // Determine if the link is active
   const isActive = (href: string) => pathname === href;
 
@@ -59,20 +34,18 @@ export const Navbar = () => {
     <NextUINavbar
       maxWidth="xl"
       position="sticky"
-      className="bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 shadow-md font-body md:py-3"
+      className="bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 shadow-md font-body md:py-3 fixed"
     >
       {/* Left Side Menu and Search Icon */}
       <NavbarContent className="flex justify-start items-center gap-4 pl-4">
         {/* Menu Icon for Mobile */}
         <NavbarMenuToggle className="lg:hidden " />
-        {/* Search Icon */}
 
-        <SearchIcon className="text-2xl text-black" />
         {/* Contact Us Button */}
         <Button
           as={NextLink}
           href="/contact"
-          className="border text-xl  border-black text-black rounded-full px-4 py-1 hover:bg-black hover:text-white transition"
+          className="border md:text-xl hidden lg:block border-black text-black rounded-full px-4 py-1 hover:bg-black hover:text-white transition"
         >
           Contact Us
         </Button>
@@ -100,7 +73,7 @@ export const Navbar = () => {
                 className={clsx(
                   linkStyles({ color: "foreground" }),
                   "text-white text-xl ",
-                  isActive(item.href) && "font-bold text-teal-800"
+                  isActive(item.href) && "font-bold underline"
                 )}
               >
                 {item.label}

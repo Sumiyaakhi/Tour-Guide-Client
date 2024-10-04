@@ -25,19 +25,33 @@ export interface IUser {
   address?: string;
   accesstoken?: number;
   refreshToken?: number;
+  createdAt?: Date;
+}
+export interface IComment {
+  _id?: string;
+  length?: number;
+  comment: string;
+  commenter: IUser;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-export interface Post {
-  id: string;
+export interface TPost {
+  _id: string;
+
   title: string;
   content: string;
-  category: "Adventure" | "Business Travel" | "Exploration"; // Define allowed categories
-  isPremium: boolean;
-  imageUrl?: string; // URL of the image, if provided
-  createdAt: Date;
-  updatedAt: Date;
-  author: string; // User who created the post
+  images?: string[];
+  category: string;
+  user: IUser;
+  upvote?: number;
+  comments?: IComment[];
+  downvote?: number;
+  premium?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
 export interface PostFormData {
   title: string;
   content: string;
