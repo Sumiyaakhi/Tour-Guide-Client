@@ -1,17 +1,15 @@
 "use server";
 
 import React from "react";
-import { getAllPosts } from "@/src/services/PostApi";
 import Post from "@/src/components/Posts/Post";
-import { useUser } from "@/src/context/user.provider";
+import { getRecentPosts } from "@/src/services/RecentPosts";
 
 const NewsFeed: React.FC = async () => {
-  const data = await getAllPosts();
-  // true if user exists, false otherwise
+  const { data: recentposts } = await getRecentPosts();
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <Post posts={data.data} /> {/* Pass both props */}
+    <div className="min-h-screen max-w-7xl mx-auto bg-gray-100 p-6">
+      <Post posts={recentposts} /> {/* Pass both props */}
     </div>
   );
 };

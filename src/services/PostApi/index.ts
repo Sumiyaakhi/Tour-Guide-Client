@@ -18,7 +18,7 @@ export const createPost = async (formData: FormData): Promise<any> => {
       },
     });
 
-    revalidateTag("post"); // Refresh the post cache after creation
+    revalidateTag("posts"); // Refresh the post cache after creation
     return data;
   } catch (error) {
     console.error("Failed to create post", error);

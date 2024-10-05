@@ -23,11 +23,7 @@ import { ThemeSwitch } from "../theme-switch";
 
 export const Navbar = () => {
   const { user } = useUser();
-  console.log("user from navbar", user);
   const pathname = usePathname();
-  console.log("pathname from the route", pathname); // Get current path
-
-  // Determine if the link is active
   const isActive = (href: string) => pathname === href;
 
   return (

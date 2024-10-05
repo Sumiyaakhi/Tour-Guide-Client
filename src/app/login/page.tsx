@@ -29,7 +29,6 @@ const SignIn = () => {
   } = useForm<FormData>();
 
   const onSubmit = (data: FormData) => {
-    console.log(data);
     handleUserLogin(data);
     userLoading(true);
   };

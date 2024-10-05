@@ -1,8 +1,15 @@
+"use client";
+
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import ReactQuill from "react-quill";
-import { motion } from "framer-motion";
+import { Button } from "@nextui-org/button";
+import { ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
 import "react-quill/dist/quill.snow.css";
+import Swal from "sweetalert2"; // For SweetAlert
+import { useCreatePost } from "@/src/hooks/post.hook";
+import { useUser } from "@/src/context/user.provider";
+import { usePathname, useRouter } from "next/navigation";
 
 type FormData = {
   title: string;
@@ -18,31 +25,97 @@ type Props = {
 
 export const PostModal = ({ closeModal }: Props) => {
   const { register, handleSubmit, setValue, watch } = useForm<FormData>();
-  const [content, setContent] = useState("");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [content, setContent] = useState<string>(""); // Store quill content as string
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]); // For multiple images
+  const {
+    mutate: createPost,
+    isPending: createPostPending,
+    isSuccess,
+  } = useCreatePost(); // Use the mutation hook
+  const [imageFiles, setImageFiles] = useState<File[]>([]); // Updated to handle multiple image files
+  const { user } = useUser();
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-    closeModal(); // Close modal after submission
+  // Handle image change for multiple image uploads
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []); // Convert FileList to an array
+
+    // Update image files state
+    setImageFiles((prevFiles) => [...prevFiles, ...files]);
+
+    // Create previews for each selected image
+    files.forEach((file) => {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setImagePreviews((prevPreviews) => [
+          ...prevPreviews,
+          reader.result as string,
+        ]);
+      };
+
+      reader.readAsDataURL(file);
+    });
   };
 
-  // Watch for image changes to preview
-  const imageFile = watch("image");
-  if (imageFile && imageFile.length) {
-    const reader = new FileReader();
-    reader.onload = (e) => setImagePreview(e.target?.result as string);
-    reader.readAsDataURL(imageFile[0]);
-  }
+  const onSubmit = async (data: FormData) => {
+    try {
+      // Extract plain text from ReactQuill HTML string
+      const textContent = extractTextFromHTML(content);
+
+      // Create form data
+      const formData = new FormData();
+      const postData = {
+        title: data.title,
+        content: textContent,
+        category: data.category,
+        user: user!._id,
+      };
+      formData.append("data", JSON.stringify(postData));
+
+      // Append each image file to the form data
+      imageFiles.forEach((imageFile) => {
+        formData.append("postImages", imageFile);
+      });
+
+      // Submit the form data
+      createPost(formData);
+
+      // Show success alert
+      Swal.fire({
+        title: "Success!",
+        text: "Post created successfully!",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+
+      // Close modal after submission
+      closeModal();
+    } catch (error) {
+      // Show error alert
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to create post. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
+  // Function to extract plain text from HTML string
+  const extractTextFromHTML = (html: string) => {
+    const tempElement = document.createElement("div");
+    tempElement.innerHTML = html;
+    return tempElement.textContent || tempElement.innerText || "";
+  };
+
+  useEffect(() => {
+    setValue("content", content); // Manually set content in react-hook-form
+  }, [content, setValue]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50"
-    >
-      <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2">
-        <h2 className="text-2xl font-semibold mb-4">Create New Post</h2>
+    <>
+      <ModalHeader className="flex flex-col gap-1">Create New Post</ModalHeader>
+      <ModalBody>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label htmlFor="title" className="block font-medium">
@@ -76,52 +149,53 @@ export const PostModal = ({ closeModal }: Props) => {
               Content
             </label>
             <ReactQuill value={content} onChange={setContent} />
-            <input
-              type="hidden"
-              {...register("content", { required: true })}
-              value={content}
-            />
           </div>
 
           <div className="mb-4">
             <label htmlFor="image" className="block font-medium">
-              Image
+              Images
             </label>
             <input
               type="file"
               {...register("image")}
               accept="image/*"
+              multiple // Allow multiple image selection
               className="w-full"
+              onChange={handleImageChange} // Handle multiple image change
             />
-            {imagePreview && (
-              <img src={imagePreview} alt="Preview" className="mt-2 h-32" />
+            {imagePreviews.length > 0 && (
+              <div className="grid grid-cols-3 gap-5 my-5 flex-wrap">
+                {imagePreviews.map((imageDataUrl, index) => (
+                  <div
+                    key={index}
+                    className="relative  w-full rounded-xl border-2 border-dashed border-default-300 p-2"
+                  >
+                    <img
+                      alt="item"
+                      className="h-full w-full object-cover object-center rounded-md"
+                      src={imageDataUrl}
+                    />
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
-          <div className="mb-4">
-            <label className="flex items-center">
-              <input type="checkbox" {...register("isPremium")} />
-              <span className="ml-2">Premium Post</span>
-            </label>
-          </div>
-
-          <div className="flex justify-end space-x-4">
-            <button
+          <ModalFooter>
+            <Button
               type="button"
-              className="py-2 px-4 bg-gray-400 text-white rounded-md"
-              onClick={closeModal}
+              color="danger"
+              variant="light"
+              onPress={closeModal}
             >
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="py-2 px-4 bg-blue-600 text-white rounded-md"
-            >
-              Submit
-            </button>
-          </div>
+            </Button>
+            <Button type="submit" color="primary" isLoading={createPostPending}>
+              Create
+            </Button>
+          </ModalFooter>
         </form>
-      </div>
-    </motion.div>
+      </ModalBody>
+    </>
   );
 };
