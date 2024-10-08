@@ -12,7 +12,7 @@ export const verifyUser = async (userId: string): Promise<any> => {
     const token = cookies().get("accessToken")?.value;
 
     const { data } = await axiosInstance.patch(
-      `/verify/${userId}`,
+      `/auth/verify/${userId}`,
       {},
       {
         headers: {
