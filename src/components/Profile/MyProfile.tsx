@@ -3,56 +3,57 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { Button } from "@nextui-org/button";
-import { useUser } from "@/src/context/user.provider"; // Assuming there's a User Context
+import { useUser } from "@/src/context/user.provider";
 import { Avatar } from "@nextui-org/avatar";
-import { CiEdit } from "react-icons/ci";
-import { MdMovieEdit, MdVerified } from "react-icons/md";
-import { useDisclosure } from "@nextui-org/modal";
-import { followUser, unfollowUser, verifyUser } from "@/src/services/UserApi";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
-import { TPost } from "@/src/types";
-import PostCard from "../Posts/PostCard";
+import { MdVerified } from "react-icons/md";
+import { followUser, verifyUser } from "@/src/services/UserApi";
+import { IUser, TPost } from "@/src/types";
 import ProfileUpdate from "./ProfileUpdate";
-import { Card, CardBody, Tab, Tabs } from "@nextui-org/react";
-import {
-  Airplay,
-  GalleryVerticalIcon,
-  HandHeart,
-  TvMinimal,
-  VideoIcon,
-} from "lucide-react";
-import { HeartFilledIcon } from "../icons";
+import TabsComponent from "./TabsComponent";
 
 interface MyProfileProps {
   myPosts: TPost[];
+  allUsers: IUser[];
 }
 
-const MyProfile: React.FC<MyProfileProps> = ({ myPosts }) => {
-  const { user, setUser } = useUser(); // Get user details from context
+const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
+  const { user, setUser } = useUser();
   console.log("user data", user);
+  const [loading, setLoading] = useState(false);
+
   const [imagePreview, setImagePreview] = useState<string>();
   const [isVerified, setIsVerified] = useState(user?.verified);
   const getTotalUpvotes = (myPosts: TPost[]) => {
     return myPosts.reduce((total, post) => total + (post.upvote || 0), 0);
   };
   const totalUpvotes = getTotalUpvotes(myPosts);
+  const allUsersExceptCurrent = allUsers.filter(
+    (Tuser) => Tuser._id !== user?._id
+  );
   console.log("Total Upvotes:", totalUpvotes);
+
   // Follow/Unfollow logic
-  const handleFollowUnfollow = async () => {
-    // try {
-    //   if (user?.followings) {
-    //     await unfollowUser(user._id);
-    //     setUser({ ...user, followings: false });
-    //     Swal.fire("Success", "Unfollowed successfully!", "success");
-    //   } else {
-    //     await followUser(user?._id);
-    //     setUser({ ...user, followings: true });
-    //     Swal.fire("Success", "Followed successfully!", "success");
-    //   }
-    // } catch (error) {
-    //   console.error("Error following/unfollowing", error);
-    //   Swal.fire("Error", "Failed to follow/unfollow!", "error");
-    // }
+  const handleToggleFollowUser = async (targetUserId: string) => {
+    try {
+      setLoading(true);
+
+      const response = await followUser(targetUserId, user?._id as string);
+      const { currentUser, message } = response;
+
+      setUser((prevUser) => {
+        return {
+          ...prevUser,
+          followings: currentUser.followings,
+        };
+      });
+
+      Swal.fire("Success", message, "success");
+    } catch (error) {
+      console.error("Error toggling follow/unfollow", error);
+      Swal.fire("Error", "Failed to follow/unfollow!", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Verify logic
@@ -103,10 +104,7 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts }) => {
 
               {/* Follow and Verify Buttons */}
               <div className="flex justify-center gap-4 mt-4 text-white">
-                <Button
-                  className="font-bold btn-primary"
-                  onClick={handleFollowUnfollow}
-                >
+                <Button className="font-bold btn-primary">
                   {user?.followings ? "Unfollow" : "Follow"}
                 </Button>
                 <Button
@@ -129,135 +127,12 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts }) => {
         </div>
       </div>
       {/* Tab items container */}
-      <div className="flex w-full flex-col max-w-4xl mx-auto">
-        <Tabs aria-label="Options" className="">
-          <Tab
-            key="posts"
-            title={
-              <div className="flex items-center space-x-2">
-                <TvMinimal />
-                <span>My Posts</span>
-              </div>
-            }
-          >
-            <Card>
-              <CardBody>
-                {/* Posts Section - takes remaining width */}
-                <div className="w-full  max-w-5xl mx-auto flex flex-col">
-                  <h1 className="md:text-2xl lg:text-3xl text-green-500 underline font-bold">
-                    My Posts
-                  </h1>
-                  {myPosts.length === 0 ? (
-                    <p>No posts available</p>
-                  ) : (
-                    myPosts.map((post) => (
-                      <PostCard
-                        key={post._id}
-                        post={post}
-                        isAuthenticated={true}
-                      />
-                    ))
-                  )}
-                </div>
-              </CardBody>
-            </Card>
-          </Tab>
-          <Tab
-            key="music"
-            title={
-              <div className="flex items-center space-x-2">
-                <HandHeart />
-                <span>Followers</span>
-              </div>
-            }
-          >
-            <Card>
-              <CardBody>
-                {user?.followers?.length ? (
-                  user.followers.map((follower, index) => (
-                    <div
-                      key={index}
-                      className="follower-item flex items-center space-x-4 mb-4"
-                    >
-                      {/* Follower Image */}
-                      <img
-                        src={follower?.img || "/default-avatar.png"}
-                        alt={`${follower?.name}'s profile`}
-                        className="w-12 h-12 rounded-full"
-                      />
-                      {/* Follower Details */}
-                      <div>
-                        <p className="text-lg font-semibold">
-                          {follower?.name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {follower?.email}
-                        </p>
-                        {/* Display the time from createdAt, fallback to current date if undefined */}
-                        <p className="text-xs text-gray-400">
-                          Followed:{" "}
-                          {follower?.createdAt
-                            ? new Date(follower.createdAt).toLocaleString()
-                            : "Unknown date"}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>No followers found.</p>
-                )}
-              </CardBody>
-            </Card>
-          </Tab>
-          <Tab
-            key="videos"
-            title={
-              <div className="flex items-center space-x-2">
-                <HeartFilledIcon />
-                <span>Followings</span>
-              </div>
-            }
-          >
-            <Card>
-              <CardBody>
-                {user?.followings?.length ? (
-                  user.followings.map((following, index) => (
-                    <div
-                      key={index}
-                      className="follower-item flex items-center space-x-4 mb-4"
-                    >
-                      {/* Follower Image */}
-                      <img
-                        src={following?.img || "/default-avatar.png"}
-                        alt={`${following?.name}'s profile`}
-                        className="w-12 h-12 rounded-full"
-                      />
-                      {/* Follower Details */}
-                      <div>
-                        <p className="text-lg font-semibold">
-                          {following?.name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {following?.email}
-                        </p>
-                        {/* Display the time from createdAt, fallback to current date if undefined */}
-                        <p className="text-xs text-gray-400">
-                          Followed:{" "}
-                          {following?.createdAt
-                            ? new Date(following.createdAt).toLocaleString()
-                            : "Unknown date"}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>No followers found.</p>
-                )}
-              </CardBody>
-            </Card>
-          </Tab>
-        </Tabs>
-      </div>
+      <TabsComponent
+        myPosts={myPosts}
+        allUsersExceptCurrent={allUsersExceptCurrent}
+        user={user as IUser}
+        handleToggleFollowUser={handleToggleFollowUser}
+      />
     </div>
   );
 };

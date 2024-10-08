@@ -3,10 +3,7 @@
 import PostDetails from "@/src/components/Posts/PostDetails";
 import axiosInstance from "@/src/lib/AxiosInstance";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const PostDetailPage = async ({ params }: { params: { postId: string } }) => {
-  //fetch with filter parameterd
-
   const res: any = await axiosInstance.get(`/post/${params.postId}`, {
     // : "no-store",
     // next: {},
@@ -16,7 +13,7 @@ const PostDetailPage = async ({ params }: { params: { postId: string } }) => {
   console.log(data);
 
   return (
-    <div className="mt-24">
+    <div className="mt-20">
       <PostDetails post={data} />
     </div>
   );

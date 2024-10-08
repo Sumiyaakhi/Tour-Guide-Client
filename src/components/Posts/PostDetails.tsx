@@ -23,6 +23,7 @@ import {
   useUpvoteIncPost,
 } from "@/src/hooks/post.hook";
 import { useUser } from "@/src/context/user.provider";
+import { IUser } from "@/src/types";
 
 // Define the PostDetailsProps interface
 interface PostDetailsProps {
@@ -43,7 +44,7 @@ interface PostDetailsProps {
     downvote: number;
     comments: Array<{
       comment: string;
-      commenter: string;
+      commenter: IUser;
       _id: string;
     }>;
   };
@@ -195,7 +196,16 @@ const PostDetails: FC<PostDetailsProps> = ({ post }) => {
             className="mb-6"
           >
             <h1 className="text-3xl font-bold mb-4 text-teal-700">{title}</h1>
-            <p className="text-xl">{content}</p>
+            <p className="text-xl">
+              {" "}
+              <span className="font-bold">Content :</span> {content}
+            </p>
+            <p className="text-xl ">
+              <span className="font-bold">Upvote(s) :</span> {upvote}
+            </p>
+            <p className="text-xl ">
+              <span className="font-bold">Downvote(s) :</span> {downvote}
+            </p>
             <p className="text-xl ">
               <span className="font-bold">Category :</span> {category}
             </p>
@@ -228,87 +238,40 @@ const PostDetails: FC<PostDetailsProps> = ({ post }) => {
             <ImageGallery images={images} />
           </motion.div>
 
-          {/* Voting Section */}
-          <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex justify-center items-center space-x-4 mb-6"
-          >
-            <div className="flex justify-between items-center w-full shadow-lg border-2 p-2 rounded-lg md:px-6">
-              {/* Upvote */}
-              <div className="flex gap-2 items-center">
-                {isUpvoted ? (
-                  <AiFillLike
-                    onClick={handleUpvote}
-                    className="w-8 h-8 cursor-pointer text-blue-600"
-                  />
-                ) : (
-                  <AiOutlineLike
-                    onClick={handleUpvote}
-                    className="w-8 h-8 cursor-pointer"
-                  />
-                )}
-                {upvote > 0 && (
-                  <h5 className="md:text-xl font-semibold">({upvote})</h5>
-                )}
-              </div>
-
-              <Divider orientation="vertical" />
-              {/* Downvote */}
-              <div className="flex gap-2 items-center">
-                {isDownvoted ? (
-                  <AiFillDislike
-                    onClick={handleDownvote}
-                    className="w-8 h-8 cursor-pointer text-red-600"
-                  />
-                ) : (
-                  <AiOutlineDislike
-                    onClick={handleDownvote}
-                    className="w-8 h-8 cursor-pointer"
-                  />
-                )}
-                {downvote > 0 && (
-                  <h5 className="md:text-xl font-semibold">({downvote})</h5>
-                )}
-              </div>
-
-              <Divider orientation="vertical" />
-              <div>
-                <CommentsModal
-                  comments={comments ?? []}
-                  currentUserEmail={user?.email}
-                  postId={post._id}
-                />
-              </div>
-              <Divider orientation="vertical" />
-              <Link href={`/news-feed/${post._id}`}>
-                <Button className="bg-white flex space-x-3 justify-center items-center border-2 border-gray-300 hover:bg-gray-200 transition duration-150">
-                  <FaShare />
-                  <span>Share</span>
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
-
-          {/* Comment Input */}
-          {isAuthenticated && (
-            <div className="flex items-center space-x-4 mb-4">
-              <textarea
+          {/* Comments Section */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold mb-4">Comments</h2>
+            <div className="flex gap-2">
+              <input
+                type="text"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="flex-1 p-2 border rounded-md"
-                placeholder="Write a comment..."
-                rows={2}
+                placeholder="Add a comment..."
+                className="flex-1 border border-gray-300 rounded-md px-4 py-2"
               />
               <Button
+                className="text-white btn-primary"
                 onClick={handleComment}
-                className="bg-blue-600 text-white"
+                color="success"
               >
-                Submit
+                Comment
               </Button>
             </div>
-          )}
+            <div className="mt-4">
+              {comments.map((comment) => (
+                <div key={comment._id} className="flex items-center my-2">
+                  <Avatar
+                    src={comment?.commenter?.img}
+                    className="w-10 h-10 mr-2"
+                  />
+                  <div className="border p-2 rounded-md w-full">
+                    <p className="font-semibold">{comment?.commenter?.name}</p>
+                    <p>{comment?.comment}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

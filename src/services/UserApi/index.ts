@@ -2,54 +2,9 @@
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 import { revalidateTag } from "next/cache";
-import envConfig from "@/src/config/envConfig";
 import { cookies } from "next/headers";
 
 // Follow a user
-export const followUser = async (userId: string): Promise<any> => {
-  try {
-    const token = cookies().get("accessToken")?.value;
-
-    const { data } = await axiosInstance.post(
-      `/follow/${userId}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
-        },
-      }
-    );
-
-    revalidateTag("user-follow"); // Refresh the follow cache after following a user
-    return data;
-  } catch (error) {
-    console.error("Failed to follow user", error);
-    throw new Error("Failed to follow user");
-  }
-};
-
-// Unfollow a user
-export const unfollowUser = async (userId: string): Promise<any> => {
-  try {
-    const token = cookies().get("accessToken")?.value;
-
-    const { data } = await axiosInstance.post(
-      `/unfollow/${userId}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
-        },
-      }
-    );
-
-    revalidateTag("user-follow"); // Refresh the follow cache after unfollowing a user
-    return data;
-  } catch (error) {
-    console.error("Failed to unfollow user", error);
-    throw new Error("Failed to unfollow user");
-  }
-};
 
 // Verify a user (Admin only)
 export const verifyUser = async (userId: string): Promise<any> => {
@@ -94,5 +49,31 @@ export const updateUserProfile = async (
   } catch (error) {
     console.error("Failed to update user profile", error);
     throw new Error("Failed to update user profile");
+  }
+};
+
+// Follow a user
+export const followUser = async (
+  targetUserId: string,
+  currentUserId: string
+): Promise<any> => {
+  try {
+    const token = cookies().get("accessToken")?.value;
+
+    const { data } = await axiosInstance.post(
+      "/auth/follow", // Endpoint for following a user
+      { targetUserId, currentUserId }, // Sending the target user ID in the request body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include Bearer token
+        },
+      }
+    );
+
+    revalidateTag("user-following"); // Refresh the following cache after following a user
+    return data;
+  } catch (error) {
+    console.error("Failed to follow user", error);
+    throw new Error("Failed to follow user");
   }
 };
