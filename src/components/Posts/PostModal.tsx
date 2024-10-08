@@ -2,14 +2,16 @@
 
 import { useForm } from "react-hook-form";
 import { useState, useEffect, ChangeEvent } from "react";
-import ReactQuill from "react-quill";
 import { Button } from "@nextui-org/button";
 import { ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
 import "react-quill/dist/quill.snow.css";
 import Swal from "sweetalert2"; // For SweetAlert
 import { useCreatePost } from "@/src/hooks/post.hook";
 import { useUser } from "@/src/context/user.provider";
-import { usePathname, useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+// Dynamically import ReactQuill with SSR disabled
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 type FormData = {
   title: string;
@@ -76,7 +78,7 @@ export const PostModal = ({ closeModal }: Props) => {
       imageFiles.forEach((imageFile) => {
         formData.append("postImages", imageFile);
       });
-
+      console.log(formData);
       // Submit the form data
       createPost(formData);
 

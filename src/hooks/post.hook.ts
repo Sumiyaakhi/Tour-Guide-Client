@@ -1,10 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   addOrUpdateComment,
   createPost,
   deleteComment,
   deletePost,
+  getMyPosts,
   updateComment,
   updateDecDownvote,
   updateDecUpvote,
@@ -12,6 +13,7 @@ import {
   updateIncUpvote,
   updatePost,
 } from "../services/PostApi";
+import { TPost } from "../types";
 
 // Hook to create a post
 export const useCreatePost = () => {
@@ -159,5 +161,12 @@ export const useDeleteComment = () => {
     onError: (error) => {
       toast.error(error.message);
     },
+  });
+};
+
+export const useGetMyPosts = () => {
+  return useQuery<any, Error>({
+    queryKey: ["GET_MY_POSTS"],
+    queryFn: async () => await getMyPosts(),
   });
 };

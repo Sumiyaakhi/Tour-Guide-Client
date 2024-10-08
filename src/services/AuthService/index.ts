@@ -4,6 +4,7 @@ import axiosInstance from "@/src/lib/AxiosInstance";
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
+import { followUser } from "../UserApi";
 
 export const registerUser = async (userData: FieldValues) => {
   try {
@@ -49,6 +50,10 @@ export const getCurrentUser = async () => {
       role: decodedToken.role,
       address: decodedToken.address,
       img: decodedToken.img,
+      bio: decodedToken.bio,
+      verified: decodedToken.verified,
+      followers: decodedToken.followers,
+      followings: decodedToken.followings,
     };
   }
 

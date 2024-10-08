@@ -14,15 +14,30 @@ export interface SearchProps {
   onSearch: (query: string) => void;
 }
 
+export type TFollower = {
+  _id: string;
+  name: string;
+  img: string;
+  email: string;
+  follower: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
 export interface IUser {
   _id: string;
   name: string;
+  bio?: string;
   email: string;
   password?: string;
   phone: string;
   img?: string;
   role: "admin" | "user";
   address?: string;
+  premium?: boolean;
+  verified?: boolean;
+  followers?: TFollower[];
+  followings?: TFollower[];
   accesstoken?: number;
   refreshToken?: number;
   createdAt?: Date;

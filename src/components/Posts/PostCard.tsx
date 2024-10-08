@@ -25,6 +25,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { Input } from "@nextui-org/input";
 import { LuSendHorizonal } from "react-icons/lu";
+import Link from "next/link";
 
 interface PostCardProps {
   post: TPost;
@@ -247,15 +248,19 @@ const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
         <div>
           <CommentsModal
             comments={comments ?? []}
-            currentUserEmail={user.email}
-            postId={post._id}
+            currentUserEmail={user?.email}
+            postId={post?._id}
           />
         </div>
         <Divider orientation="vertical" />
-        <Button className="bg-white flex space-x-3 justify-center items-center">
-          <h5 className="md:text-xl font-semibold hidden md:block">Share</h5>
-          <FaShare className="w-5 h-5 cursor-pointer" />
-        </Button>
+        <Link href={`/news-feed/${post._id}`}>
+          <Button className="bg-white flex space-x-3 justify-center items-center">
+            <h5 className="md:text-xl font-semibold hidden md:block">
+              Show Details
+            </h5>
+            <FaShare className="w-5 h-5 cursor-pointer" />
+          </Button>
+        </Link>
       </div>
 
       {/* Comment input */}

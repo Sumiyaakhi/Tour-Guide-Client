@@ -57,9 +57,7 @@ export default function NavbarDropdown() {
         <DropdownItem onClick={() => handleNavigation("/dashboard")}>
           Dashboard
         </DropdownItem>
-        <DropdownItem onClick={() => handleNavigation("/profile/create-post")}>
-          Create Post
-        </DropdownItem>
+
         <DropdownItem
           onClick={() => handleLogout()}
           key="delete"
