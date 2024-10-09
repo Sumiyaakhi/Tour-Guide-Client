@@ -62,10 +62,15 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
       window.location.href = res.data.paymentSession.paymentUrl;
 
       // After successful verification (on payment success):
-      setUser((prevUser) => ({
-        ...prevUser,
-        verified: true,
-      }));
+      setUser((prevUser: IUser | any) => {
+        if (prevUser) {
+          return {
+            ...prevUser,
+            verified: true, // Modify only if prevUser exists
+          };
+        }
+        return prevUser; // Return null or whatever the previous state was
+      });
     } catch (error) {
       console.error("Error verifying user", error);
       Swal.fire("Error", "Failed to verify user!", "error");

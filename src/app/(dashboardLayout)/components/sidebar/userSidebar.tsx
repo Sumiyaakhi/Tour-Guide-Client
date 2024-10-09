@@ -1,11 +1,22 @@
-import { Car, Cog, DollarSign, History, Home } from "lucide-react";
-import Link from "next/link";
+import {
+  Car,
+  DollarSign,
+  HeartCrackIcon,
+  HeartHandshake,
+  History,
+  Home,
+} from "lucide-react";
+import img from "../../../../assets/travel logo.png";
 import { usePathname } from "next/navigation";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarMenu } from "./sidebar-menu";
 import { CollapseItems } from "./collapse-items";
 import { useSidebarContext } from "../../layout/layout-context";
 import { useState } from "react";
+import Image from "next/image";
+import { AiFillProfile } from "react-icons/ai";
+import { BsCardImage } from "react-icons/bs";
+import { HeartFilledIcon } from "@/src/components/icons";
 
 // Sidebar component
 export const SidebarWrapper = () => {
@@ -33,11 +44,17 @@ export const SidebarWrapper = () => {
         } md:ml-0 md:translate-x-0 md:static md:h-screen`}
       >
         {/* Sidebar Header */}
-        <div className="flex gap-8 items-center px-6">
-          <Link href="/" className="flex items-center">
-            <Cog />
-            <p className="font-bold text-inherit px-4">APOLLO GEARS</p>
-          </Link>
+        <div className="flex flex-col justify-center gap-2 items-center px-6">
+          {/* Center Brand Logo */}
+
+          <Image
+            className=""
+            src={img}
+            alt="travel logo"
+            width={50}
+            height={50}
+          />
+          <p className="md:text-xl text-teal-700 font-brand">Wayfarer World</p>
         </div>
 
         {/* Sidebar Body */}
@@ -47,56 +64,52 @@ export const SidebarWrapper = () => {
             <SidebarItem
               title="Home"
               icon={<Home />}
-              isActive={pathname === "/dashboard"}
+              // isActive={pathname === "/dashboard"}
               href="/dashboard"
             />
-            <SidebarMenu title="Main Menu">
+            <SidebarMenu title="User Dashboard Route">
               <SidebarItem
-                isActive={pathname === "/dashboard/rent-car"}
-                title="Rent Car"
-                icon={<Car />}
-                href="/dashboard/rent-car"
+                isActive={pathname === "/dashboard/profile"}
+                title="My Profile"
+                icon={<AiFillProfile />}
+                href="/dashboard/profile"
               />
               <SidebarItem
-                isActive={pathname === "/dashboard/payments"}
-                title="Payments"
-                icon={<DollarSign />}
-                href="/dashboard/payments"
+                isActive={pathname === "/dashboard/posts"}
+                title="My Posts"
+                icon={<BsCardImage />}
+                href="/dashboard/posts"
               />
-              <CollapseItems
-                icon={<History />}
-                items={["Banks Accounts", "Credit Cards", "Loans"]}
-                title="Rent History"
+
+              <SidebarItem
+                isActive={pathname === "/dashboard/followers"}
+                title="My Followers"
+                icon={<HeartHandshake />}
+                href="/dashboard/followers"
               />
               <SidebarItem
-                isActive={pathname === "/customers"}
-                title="Customers"
-                icon={<Home />}
-                href="/customers"
+                isActive={pathname === "/dashboard/followings"}
+                title="My Followings"
+                icon={<HeartFilledIcon />}
+                href="/dashboard/followings"
               />
-              <SidebarItem
-                isActive={pathname === "/products"}
-                title="Products"
-                icon={<Home />}
-                href="/products"
-              />
-              <SidebarItem
+              {/* <SidebarItem
                 isActive={pathname === "/reports"}
                 title="Reports"
                 icon={<Home />}
                 href="/reports"
-              />
+              /> */}
             </SidebarMenu>
 
             {/* Updates Section */}
-            <SidebarMenu title="Updates">
+            {/* <SidebarMenu title="Updates">
               <SidebarItem
                 isActive={pathname === "/changelog"}
                 title="Changelog"
                 icon={<Home />}
                 href="/changelog"
               />
-            </SidebarMenu>
+            </SidebarMenu> */}
           </div>
         </div>
       </div>

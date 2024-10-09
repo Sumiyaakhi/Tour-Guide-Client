@@ -26,6 +26,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { Input } from "@nextui-org/input";
 import { LuSendHorizonal } from "react-icons/lu";
 import Link from "next/link";
+import { useUser } from "@/src/context/user.provider";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/dropdown";
+import { EllipsisVertical } from "lucide-react";
+import { deletePost, updatePost } from "@/src/services/PostApi";
 
 interface PostCardProps {
   post: TPost;
@@ -43,20 +52,75 @@ const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
     upvote: initialUpvote = 0,
     downvote: initialDownvote = 0,
   } = post || {};
-
+  const { user: LoggedInUser } = useUser();
   const [upvote, setUpvote] = useState<number>(initialUpvote);
   const [downvote, setDownvote] = useState<number>(initialDownvote);
   const [isUpvoted, setIsUpvoted] = useState<boolean>(false);
   const [isDownvoted, setIsDownvoted] = useState<boolean>(false);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
-
   const { mutate: updateIncUpvote } = useUpvoteIncPost();
   const { mutate: updateDecUpvote } = useUpvoteDecPost();
   const { mutate: updateIncDownvote } = useDownvoteIncPost();
   const { mutate: updateDecDownvote } = useDownvoteDecPost();
   const { mutate: addOrUpdateComment } = useAddOrUpdateComment();
   const pathname = usePathname();
+
+  const handleEdit = async (postId: string) => {
+    // Open your modal or form for editing
+    const { value: formData } = await Swal.fire({
+      title: "Edit Post",
+      html: `<input id="title" class="swal2-input" placeholder="Title" value="${title}">
+             <textarea id="content" class="swal2-textarea" placeholder="Content">${content}</textarea>`,
+      focusConfirm: false,
+      preConfirm: () => {
+        const title = (document.getElementById("title") as HTMLInputElement)
+          .value;
+        const content = (
+          document.getElementById("content") as HTMLTextAreaElement
+        ).value;
+        return { title, content };
+      },
+    });
+
+    if (formData) {
+      // Create a FormData object for the images (if applicable)
+      const updatedData = new FormData();
+      updatedData.append("title", formData.title);
+      updatedData.append("content", formData.content);
+      // Append images if needed
+
+      try {
+        await updatePost(postId, updatedData);
+        Swal.fire("Success!", "Post updated successfully!", "success");
+        // Optionally refresh or update your posts
+      } catch (error) {
+        Swal.fire("Error!", "Failed to update the post.", "error");
+      }
+    }
+  };
+
+  const handleDelete = async (postId: string) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deletePost(postId);
+        Swal.fire("Deleted!", "Your post has been deleted.", "success");
+        // Optionally refresh or update your posts
+      } catch (error) {
+        Swal.fire("Error!", "Failed to delete the post.", "error");
+      }
+    }
+  };
+
   const showLoginAlert = () => {
     const currentPage = pathname;
     Swal.fire({
@@ -172,28 +236,27 @@ const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
         </div>
 
         {/* Dropdown for edit/delete */}
-        <div className="relative">
-          <HiMiniEllipsisVertical
-            className="md:w-6 md:h-8 cursor-pointer"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-          />
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg">
-              <button
-                className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                onClick={() => {
-                  console.log("Edit post");
-                  setDropdownOpen(false);
-                }}
+        {/* Dropdown for edit/delete */}
+        {LoggedInUser?._id === user?._id && (
+          <Dropdown>
+            <DropdownTrigger>
+              <EllipsisVertical />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Static Actions">
+              <DropdownItem key="edit" onClick={() => handleEdit(post._id)}>
+                Edit file
+              </DropdownItem>
+              <DropdownItem
+                key="delete"
+                className="text-danger"
+                color="danger"
+                onClick={() => handleDelete(post._id)}
               >
-                Edit Post
-              </button>
-              <button className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
-                Delete Post
-              </button>
-            </div>
-          )}
-        </div>
+                Delete file
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        )}
       </div>
 
       {/* Post content */}

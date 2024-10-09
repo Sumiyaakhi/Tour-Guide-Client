@@ -1,7 +1,9 @@
 // import { logOut } from "@/app/(withComonLayout)/actions/auth";
 // import { useAuth } from "@/lib/AuthProviders";
-
+"use client";
 import { ThemeSwitcher } from "@/src/components/shared/ThemeSwitcher";
+import { useUser } from "@/src/context/user.provider";
+import { logout } from "@/src/services/AuthService";
 import { Avatar } from "@nextui-org/avatar";
 import {
   Dropdown,
@@ -10,25 +12,22 @@ import {
   DropdownTrigger,
 } from "@nextui-org/dropdown";
 import { NavbarItem } from "@nextui-org/navbar";
+import { useRouter } from "next/navigation";
 
 export const UserDropdown = () => {
-  //   const router = useRouter();
-  //   const {user,setUser} = useAuth();
-  //   const logOutUser = async () => {
-  //     await logOut();
-  //     setUser(null)
-  //     router.push("/")
-  //   };
+  const { user, setUser } = useUser();
+  const router = useRouter();
+
+  const logOutUser = async () => {
+    await logout();
+    setUser(null);
+    router.push("/");
+  };
   return (
     <Dropdown>
       <NavbarItem>
         <DropdownTrigger>
-          <Avatar
-            as="button"
-            color="secondary"
-            size="md"
-            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-          />
+          <Avatar as="button" color="secondary" size="md" src={user?.img} />
         </DropdownTrigger>
       </NavbarItem>
       <DropdownMenu
@@ -40,7 +39,7 @@ export const UserDropdown = () => {
           className="flex flex-col justify-start w-full items-start"
         >
           <p>Signed in as</p>
-          {/* <p>{user?.email}</p> */}
+          <p>{user?.email}</p>
         </DropdownItem>
         <DropdownItem key="settings">My Settings</DropdownItem>
         <DropdownItem key="team_settings">Team Settings</DropdownItem>
@@ -49,7 +48,7 @@ export const UserDropdown = () => {
         <DropdownItem key="configurations">Configurations</DropdownItem>
         <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
         <DropdownItem
-          //   onClick={() => logOutUser()}
+          onClick={() => logOutUser()}
           key="logout"
           color="danger"
           className="text-danger "

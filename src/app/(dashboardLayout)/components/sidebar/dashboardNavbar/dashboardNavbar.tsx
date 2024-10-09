@@ -29,7 +29,7 @@ export const NavbarWrapper = ({ children }: Props) => {
           )}
         </NavbarContent>
         <NavbarContent className="w-full max-md:hidden">
-          <Input
+          {/* <Input
             startContent={<SearchCheck />}
             isClearable
             className="w-full"
@@ -38,7 +38,7 @@ export const NavbarWrapper = ({ children }: Props) => {
               mainWrapper: "w-full",
             }}
             placeholder="Search..."
-          />
+          /> */}
         </NavbarContent>
         <NavbarContent
           justify="end"

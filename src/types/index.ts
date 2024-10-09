@@ -19,6 +19,7 @@ export type TFollower = {
   name: string;
   img: string;
   email: string;
+  address?: string;
   follower: string;
   createdAt?: Date;
   updatedAt?: Date;

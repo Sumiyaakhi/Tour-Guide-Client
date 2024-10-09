@@ -10,6 +10,7 @@ import { Input } from "@nextui-org/input";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import InfiniteScroll from "react-infinite-scroll-component";
+import useDebounce from "@/src/hooks/debounce.hook";
 
 const Post = ({ posts }: { posts: TPost[] }) => {
   const { user } = useUser(); // Access the user context
@@ -21,9 +22,12 @@ const Post = ({ posts }: { posts: TPost[] }) => {
   const [paginatedPosts, setPaginatedPosts] = useState<TPost[]>([]);
   const [hasMore, setHasMore] = useState(true); // For Infinite Scroll
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State for drawer open/close
-  console.log(posts.length);
+
   const isAuthenticated = !!user;
   const postsPerPage = 5;
+
+  // Debounce the search term to prevent too many updates while typing
+  const debouncedSearchTerm = useDebounce(searchTerm, 500); // 500ms delay
 
   // Load initial posts on component mount
   useEffect(() => {
@@ -58,12 +62,14 @@ const Post = ({ posts }: { posts: TPost[] }) => {
   const filteredPosts = useMemo(() => {
     let filtered = paginatedPosts;
 
-    // Search by title or content
-    if (searchTerm) {
+    // Search by title or content using debounced search term
+    if (debouncedSearchTerm) {
       filtered = filtered.filter(
         (post) =>
-          post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          post.content.toLowerCase().includes(searchTerm.toLowerCase())
+          post.title
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
+          post.content.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       );
     }
 
@@ -83,7 +89,13 @@ const Post = ({ posts }: { posts: TPost[] }) => {
     }
 
     return filtered;
-  }, [paginatedPosts, searchTerm, categoryFilter, userFilter, sortByUpvotes]);
+  }, [
+    paginatedPosts,
+    debouncedSearchTerm,
+    categoryFilter,
+    userFilter,
+    sortByUpvotes,
+  ]);
 
   // Toggle the drawer for small devices
   const toggleDrawer = () => {
@@ -102,7 +114,7 @@ const Post = ({ posts }: { posts: TPost[] }) => {
               type="text"
               placeholder="Search posts by title or content..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)} // Directly set searchTerm here
               className="pl-10 border border-gray-300 rounded w-full"
             />
             {/* Filter Button for Small Devices */}
@@ -114,7 +126,7 @@ const Post = ({ posts }: { posts: TPost[] }) => {
             </div>
             <button
               onClick={() => {
-                console.log("Searching for:", searchTerm);
+                console.log("Searching for:", debouncedSearchTerm); // Logging debounced search term
               }}
               className="ml-3 px-4 py-2 bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 text-white rounded"
             >
