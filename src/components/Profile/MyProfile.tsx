@@ -20,14 +20,15 @@ interface MyProfileProps {
 const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
   const { user, setUser } = useUser();
   const [loading, setLoading] = useState(false);
-  const [isVerified, setIsVerified] = useState(user?.verified || false); // Initial state based on user data
   const [imagePreview, setImagePreview] = useState<string>();
 
+  // Get total upvotes for the user's posts
   const getTotalUpvotes = (myPosts: TPost[]) => {
     return myPosts.reduce((total, post) => total + (post.upvote || 0), 0);
   };
   const totalUpvotes = getTotalUpvotes(myPosts);
 
+  // Get all users except the current user
   const allUsersExceptCurrent = allUsers.filter(
     (Tuser) => Tuser._id !== user?._id
   );
@@ -36,10 +37,10 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
   const handleToggleFollowUser = async (targetUserId: string) => {
     try {
       setLoading(true);
-
       const response = await followUser(targetUserId, user?._id as string);
       const { currentUser, message } = response;
 
+      // Update user followings
       setUser((prevUser) => ({
         ...prevUser,
         followings: currentUser.followings,
@@ -54,14 +55,13 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
     }
   };
 
-  // Verify logic
+  // Verify user logic
   const handleVerify = async () => {
     try {
       const res = await verifyUser(user?._id as string);
       window.location.href = res.data.paymentSession.paymentUrl;
 
       // After successful verification (on payment success):
-      setIsVerified(true);
       setUser((prevUser) => ({
         ...prevUser,
         verified: true,
@@ -72,6 +72,9 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
     }
   };
 
+  // Check if user is verified
+  const isVerified = user?.verified || false;
+
   return (
     <div className="">
       <div className="bg-black w-full pt-24">
@@ -81,31 +84,35 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
             {/* Profile Picture */}
             <div className="flex justify-center my-4">
               <Avatar
-                src={imagePreview || user?.img}
+                src={imagePreview || user?.img || "/default-avatar.png"} // Fallback image
                 className="md:w-64 md:h-64 rounded-full border-2 border-gray-300"
               />
             </div>
             <div className="pt-4 md:pt-12 flex gap-2 justify-center flex-col items-center">
               {/* User Info */}
-              <div className="text-center">
-                <div className="flex gap-2 justify-center items-center">
-                  <h1 className="text-3xl text-white font-bold mb-2">
-                    {user?.name}
+              {user ? (
+                <>
+                  <div className="flex gap-2 justify-center items-center">
+                    <h1 className="text-3xl text-white font-bold mb-2">
+                      {user?.name}
+                    </h1>
                     {isVerified && (
-                      <>
+                      <div className="flex gap-1">
                         <MdVerified className="w-6 h-6 text-blue-700 ml-2" />
                         <BsStars className="w-5 h-5 text-yellow-400 ml-1" />
-                      </>
+                      </div>
                     )}
-                  </h1>
-                </div>
-                <p className="text-white">
-                  {user?.email || "No email available"}
-                </p>
-                <p className="text-white mt-2">
-                  {user?.bio || "No bio available"}
-                </p>
-              </div>
+                  </div>
+                  <p className="text-white">
+                    {user?.email || "No email available"}
+                  </p>
+                  <p className="text-white mt-2">
+                    {user?.bio || "No bio available"}
+                  </p>
+                </>
+              ) : (
+                <p className="text-white">No user data available</p>
+              )}
 
               {/* Follow and Verify Buttons */}
               <div className="flex justify-between gap-4 mt-4 text-white">
@@ -113,9 +120,13 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
                   <Button
                     className="font-bold btn-primary"
                     onClick={handleVerify}
-                    disabled={isVerified} // Disable button if verified
+                    disabled={isVerified || loading} // Disable button if verified or loading
                   >
-                    {isVerified ? "Verified" : "Verify Profile"}
+                    {loading
+                      ? "Processing..."
+                      : isVerified
+                        ? "Verified"
+                        : "Verify Profile"}
                   </Button>
                 )}
                 {/* Edit Profile Button */}

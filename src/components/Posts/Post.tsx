@@ -1,21 +1,15 @@
 "use client";
 
-import React, {
-  useState,
-  useMemo,
-  useEffect,
-  useRef,
-  useCallback,
-} from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { IUser, TPost } from "@/src/types";
 import PostCard from "./PostCard";
 import { useUser } from "@/src/context/user.provider";
 import FilterBar from "./FilterBar";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaFilter } from "react-icons/fa";
 import { Input } from "@nextui-org/input";
 import Drawer from "react-modern-drawer";
-import "react-modern-drawer/dist/index.css"; // Import styles for the drawer
-import { FaFilter } from "react-icons/fa"; // Add an icon for the filter button
+import "react-modern-drawer/dist/index.css";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const Post = ({ posts }: { posts: TPost[] }) => {
   const { user } = useUser(); // Access the user context
@@ -25,12 +19,11 @@ const Post = ({ posts }: { posts: TPost[] }) => {
   const [sortByUpvotes, setSortByUpvotes] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedPosts, setPaginatedPosts] = useState<TPost[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true); // For Infinite Scroll
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State for drawer open/close
-  const observerRef = useRef<HTMLDivElement>(null); // Ref to track the observer
-
+  console.log(posts.length);
   const isAuthenticated = !!user;
-  const postsPerPage = 10;
+  const postsPerPage = 5;
 
   // Load initial posts on component mount
   useEffect(() => {
@@ -47,17 +40,19 @@ const Post = ({ posts }: { posts: TPost[] }) => {
   }, [posts]);
 
   // Function to load more posts (paginated)
-  const loadMorePosts = useCallback(() => {
-    if (loading) return;
-    setLoading(true);
+  const loadMorePosts = () => {
     const start = (currentPage - 1) * postsPerPage;
     const end = start + postsPerPage;
     const newPosts = posts.slice(start, end);
 
     setPaginatedPosts((prevPosts) => [...prevPosts, ...newPosts]);
+
+    if (newPosts.length === 0 || newPosts.length < postsPerPage) {
+      setHasMore(false); // No more posts to load
+    }
+
     setCurrentPage((prevPage) => prevPage + 1);
-    setLoading(false);
-  }, [loading, currentPage, posts]);
+  };
 
   // Filter, search, and sort logic
   const filteredPosts = useMemo(() => {
@@ -90,26 +85,6 @@ const Post = ({ posts }: { posts: TPost[] }) => {
     return filtered;
   }, [paginatedPosts, searchTerm, categoryFilter, userFilter, sortByUpvotes]);
 
-  // Infinite scroll logic with IntersectionObserver
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMorePosts();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) observer.unobserve(observerRef.current);
-    };
-  }, [loadMorePosts]);
-
   // Toggle the drawer for small devices
   const toggleDrawer = () => {
     setIsDrawerOpen((prevState) => !prevState);
@@ -132,7 +107,7 @@ const Post = ({ posts }: { posts: TPost[] }) => {
             />
             {/* Filter Button for Small Devices */}
             <div className="flex gap-1 ml-3 px-4 py-2 bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 text-white rounded lg:hidden">
-              <button onClick={toggleDrawer} className="">
+              <button onClick={toggleDrawer}>
                 <FaFilter className="inline mr-2" />
               </button>
               <p>Filters</p>
@@ -146,22 +121,28 @@ const Post = ({ posts }: { posts: TPost[] }) => {
               Search
             </button>
           </div>
+
           {/* Display Posts */}
-          <div className="flex-grow mx-auto my-3 w-full md:max-w-[720px]  mt-36">
-            {filteredPosts.length > 0 ? (
-              filteredPosts.map((post: TPost, index) => (
-                <PostCard
-                  key={index}
-                  post={post}
-                  isAuthenticated={isAuthenticated}
-                />
-              ))
-            ) : (
-              <p>No posts found matching your criteria.</p>
-            )}
-            {/* Loading more posts */}
-            {loading && <p>Loading more posts...</p>}
-            <div ref={observerRef} className="h-10" />
+          <div className="flex-grow mx-auto my-3 w-full md:max-w-[720px] mt-36">
+            <InfiniteScroll
+              dataLength={filteredPosts.length}
+              next={loadMorePosts}
+              hasMore={hasMore}
+              loader={<p>Loading more posts...</p>}
+              endMessage={<p>No more posts to load.</p>}
+            >
+              {filteredPosts.length > 0 ? (
+                filteredPosts.map((post: TPost, index) => (
+                  <PostCard
+                    key={index}
+                    post={post}
+                    isAuthenticated={isAuthenticated}
+                  />
+                ))
+              ) : (
+                <p>No posts found matching your criteria.</p>
+              )}
+            </InfiniteScroll>
           </div>
         </div>
 
