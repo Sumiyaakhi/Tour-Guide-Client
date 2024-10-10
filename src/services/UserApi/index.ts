@@ -77,3 +77,50 @@ export const followUser = async (
     throw new Error("Failed to follow user");
   }
 };
+
+// Update user role
+export const updateUserRole = async (
+  userId: string,
+  newRole: "admin" | "user"
+): Promise<any> => {
+  try {
+    const token = cookies().get("accessToken")?.value;
+
+    const { data } = await axiosInstance.patch(
+      `/auth/user/${userId}`, // Endpoint for updating user role
+      { role: newRole }, // Sending the userId and the new role in the request body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include Bearer token for authorization
+        },
+      }
+    );
+
+    revalidateTag("user-roles"); // Refresh the cache related to user roles after updating
+    return data;
+  } catch (error) {
+    console.error("Failed to update user role", error);
+    throw new Error("Failed to update user role");
+  }
+};
+// Update user role
+// Delete user
+export const deleteUser = async (userId: string): Promise<any> => {
+  try {
+    const token = cookies().get("accessToken")?.value;
+
+    const { data } = await axiosInstance.delete(
+      `/auth/${userId}`, // Endpoint for deleting a user by userId
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include Bearer token for authorization
+        },
+      }
+    );
+
+    return data;
+  } catch (error) {
+    console.error("Failed to delete user", error);
+    throw new Error("Failed to delete user");
+  }
+};

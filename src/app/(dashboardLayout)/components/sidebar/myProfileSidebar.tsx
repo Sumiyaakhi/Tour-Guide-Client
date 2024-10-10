@@ -2,12 +2,13 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { CollapseItems } from "./collapse-items";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarMenu } from "./sidebar-menu";
-
-import Link from "next/link";
+import img from "../../../../assets/travel logo.png";
 import { usePathname } from "next/navigation";
 import { Avatar } from "@nextui-org/avatar";
-import { Car, Cog, Home, User } from "lucide-react";
+import { ContainerIcon, HandCoins, Home, User } from "lucide-react";
 import { useSidebarContext } from "../../layout/layout-context";
+import Image from "next/image";
+import { FaMoneyCheck } from "react-icons/fa";
 
 export const AdminSidebarWrapper = () => {
   const pathname = usePathname();
@@ -26,11 +27,17 @@ export const AdminSidebarWrapper = () => {
         } md:ml-0 md:translate-x-0 md:static md:h-screen`}
       >
         {/* Sidebar Header */}
-        <div className="flex gap-8 items-center px-6">
-          <Link className="flex items-center" href="/">
-            <Cog />
-            <p className="font-bold text-inherit px-4">APOLLO GEARS</p>
-          </Link>
+        <div className="flex flex-col justify-center gap-2 items-center px-6">
+          {/* Center Brand Logo */}
+
+          <Image
+            className=""
+            src={img}
+            alt="travel logo"
+            width={50}
+            height={50}
+          />
+          <p className="md:text-xl text-teal-500 font-brand">Wayfarer World</p>
         </div>
 
         {/* Sidebar Body */}
@@ -45,93 +52,24 @@ export const AdminSidebarWrapper = () => {
             />
             <SidebarMenu title="Main Menu">
               <SidebarItem
-                isActive={pathname === "/admin-dashboard/cars-management"}
-                title="Cars Manage"
-                icon={<Car />}
-                href="/admin-dashboard/cars-management"
-              />
-              <SidebarItem
-                isActive={pathname === "/admin-dashboard/users-management"}
+                isActive={pathname === "/admin-dashboard/user-management"}
                 title="Users Manage"
                 icon={<User />}
-                href="/admin-dashboard/users-management"
-              />
-              <CollapseItems
-                icon={<Home />}
-                items={["Banks Accounts", "Credit Cards"]}
-                title="Balances"
+                href="/admin-dashboard/user-management"
               />
               <SidebarItem
-                isActive={pathname === "/customers"}
-                title="Customers"
-                icon={<Home />}
-                href="/customers"
+                isActive={pathname === "/admin-dashboard/content-management"}
+                title="Content Manage"
+                icon={<ContainerIcon />}
+                href="/admin-dashboard/content-management"
               />
               <SidebarItem
-                isActive={pathname === "/products"}
-                title="Products"
-                icon={<Home />}
-                href="/products"
-              />
-              <SidebarItem
-                isActive={pathname === "/reports"}
-                title="Reports"
-                icon={<Home />}
-                href="/reports"
+                isActive={pathname === "/admin-dashboard/payment-management"}
+                title="Payment Manage"
+                icon={<HandCoins />}
+                href="/admin-dashboard/payment-management"
               />
             </SidebarMenu>
-
-            {/* General Settings */}
-            <SidebarMenu title="General">
-              <SidebarItem
-                isActive={pathname === "/developers"}
-                title="Developers"
-                icon={<Home />}
-                href="/developers"
-              />
-              <SidebarItem
-                isActive={pathname === "/view"}
-                title="View Test Data"
-                icon={<Home />}
-                href="/view"
-              />
-              <SidebarItem
-                isActive={pathname === "/settings"}
-                title="Settings"
-                icon={<Home />}
-                href="/settings"
-              />
-            </SidebarMenu>
-
-            {/* Updates Section */}
-            <SidebarMenu title="Updates">
-              <SidebarItem
-                isActive={pathname === "/changelog"}
-                title="Changelog"
-                icon={<Home />}
-                href="/changelog"
-              />
-            </SidebarMenu>
-          </div>
-
-          {/* Sidebar Footer */}
-          <div className="flex items-center justify-center gap-6 pt-16 pb-8 px-8 md:pt-10 md:pb-0">
-            <Tooltip content={"Settings"} color="primary">
-              <div className="max-w-fit">
-                <Home />
-              </div>
-            </Tooltip>
-            <Tooltip content={"Adjustments"} color="primary">
-              <div className="max-w-fit">
-                <Home />
-              </div>
-            </Tooltip>
-            <Tooltip content={"Profile"} color="primary">
-              <Avatar
-                src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                size="sm"
-              />
-            </Tooltip>
           </div>
         </div>
       </div>

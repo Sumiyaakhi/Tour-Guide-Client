@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { AdminLayout } from "./layout/adminLayout";
 
 export const metadata: Metadata = {
-  title: "Dashboard - Apollo Gears",
-  description: "Next Level Riding Sharing Service",
+  title: "Dashboard ",
+  description: "Next Level Tour Guide Sharing Service",
 };
 
 export default function AdminDashboardLayout({

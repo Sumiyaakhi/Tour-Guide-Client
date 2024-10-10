@@ -43,6 +43,7 @@ export interface IUser {
   refreshToken?: number;
   createdAt?: Date;
 }
+
 export interface IComment {
   _id?: string;
   length?: number;

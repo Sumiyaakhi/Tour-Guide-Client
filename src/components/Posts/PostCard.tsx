@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { TPost } from "@/src/types";
-import { HiMiniEllipsisVertical } from "react-icons/hi2";
 import {
   AiOutlineDislike,
   AiOutlineLike,

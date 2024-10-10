@@ -2,10 +2,8 @@ import React from "react";
 import { ChevronLeft, Menu, SearchCheck } from "lucide-react";
 import { UserDropdown } from "./user-dropdown";
 import { Navbar, NavbarContent } from "@nextui-org/navbar";
-import { Input } from "@nextui-org/input";
 import { useSidebarContext } from "../../../layout/layout-context";
-// import { useSidebarContext } from "../../layout/layout-context";
-// import { UserDropdown } from "./user-dropdown";
+
 interface Props {
   children: React.ReactNode;
 }
@@ -28,18 +26,7 @@ export const NavbarWrapper = ({ children }: Props) => {
             <Menu onClick={setCollapsed}></Menu>
           )}
         </NavbarContent>
-        <NavbarContent className="w-full max-md:hidden">
-          {/* <Input
-            startContent={<SearchCheck />}
-            isClearable
-            className="w-full"
-            classNames={{
-              input: "w-full",
-              mainWrapper: "w-full",
-            }}
-            placeholder="Search..."
-          /> */}
-        </NavbarContent>
+        <NavbarContent className="w-full max-md:hidden"></NavbarContent>
         <NavbarContent
           justify="end"
           className="w-fit data-[justify=end]:flex-grow-0"

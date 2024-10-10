@@ -1,44 +1,79 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getCurrentUser } from "./services/AuthService";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { jwtDecode } from "jwt-decode";
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 
-type user = {
-  name: string;
-  token: string;
-  role: "user" | "admin";
-};
+const authRoutes = ["/login", "/register"];
 
-type Role = keyof typeof roleBasedRoutes;
-const AuthRoutes = ["/login", "/register"];
-const roleBasedRoutes = {
-  // user: ["/^/profile/"],
-  admin: ["/admin"],
-};
-// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const user = await getCurrentUser();
-  if (!user) {
-    if (AuthRoutes.includes(pathname)) {
+  console.log(pathname, "pathname");
+
+  //pathname , acessToken
+
+  //pathname = admin-dashboard -> accessToken = admin -> admin-dashboard &&
+  //pathname = admin-dashboard -> accessToken = user -> home page
+
+  const accessToken = cookies().get("accessToken")?.value;
+
+  if (!accessToken) {
+    //Protecting hybrid routes
+    if (authRoutes.includes(pathname)) {
       return NextResponse.next();
     } else {
+      //   return NextResponse.redirect(new URL("/login", request.url));
       return NextResponse.redirect(
-        new URL(`/login?redirect=${pathname}`, request.url)
+        new URL(
+          pathname ? `/login?redirect=${pathname}` : "/login",
+          request.url
+        )
       );
     }
   }
 
-  if (user?.role && roleBasedRoutes[user?.role as Role]) {
-    const routes = roleBasedRoutes[user?.role as Role];
-    if (routes.some((route: string) => pathname.match(route))) {
-      return NextResponse.next();
-    }
+  //Role based authorization
+
+  let decodedToken = null;
+
+  decodedToken = jwtDecode(accessToken) as any;
+
+  console.log(decodedToken, "decodedToken");
+
+  const role = decodedToken?.role;
+
+  console.log(role, "role");
+  console.log(pathname, "pathname");
+
+  // /admin-dashboard - ok
+  // /admin-dashboard/car-management - ok
+  if (role === "admin" && pathname.match(/^\/admin-dashboard/)) {
+    return NextResponse.next();
   }
+
+  // /dashboard , /dashboard/my-requested-rides , /profile
+  if (role === "user" && pathname.match(/^\/dashboard/)) {
+    return NextResponse.next();
+  }
+
   return NextResponse.redirect(new URL("/", request.url));
+
+  //decodedToken.role
 }
 
-// See "Matching Paths" below to learn more
+//!accessToken -> /login -> jete dao
+
 export const config = {
-  matcher: ["/login", "/register"],
+  matcher: [
+    "/login",
+    "/register",
+    "/dashboard/:page*",
+    "/admin-dashboard/:page*",
+  ],
 };
+
+//public - cars
+//private - admin, driver, user
+//hybrid - login, register
+
+//middleware.ts (dashboard, admin-dashboard) -> layout.tsx -> page.tax / dashboard/page.tsx

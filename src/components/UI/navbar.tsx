@@ -90,7 +90,6 @@ export const Navbar = () => {
             </Link>
           </div>
         )}
-        <ThemeSwitch />
       </NavbarContent>
 
       {/* Mobile Dropdown Menu */}

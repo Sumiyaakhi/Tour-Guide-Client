@@ -18,7 +18,7 @@ const UserFollowings = () => {
       const response = await followUser(targetUserId, user?._id as string);
       const { currentUser, message } = response;
 
-      setUser((prevUser: IUser | null) => {
+      setUser((prevUser: IUser | any) => {
         if (prevUser) {
           return {
             ...prevUser,
@@ -39,7 +39,7 @@ const UserFollowings = () => {
   };
   return (
     <div className="max-w-5xl mx-auto gap-6 grid grid-cols-1 ">
-      <p className="text-xl text-center font-bold text-teal-800">
+      <p className="text-xl text-center font-bold text-teal-500">
         Total Followings: {userFollowings?.length} person
       </p>
       {userFollowings?.map((following) => (

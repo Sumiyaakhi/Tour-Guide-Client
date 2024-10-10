@@ -39,7 +39,7 @@ const UserFollowers = () => {
   };
   return (
     <div className="max-w-5xl mx-auto gap-6 grid grid-cols-1 ">
-      <p className="text-xl text-center font-bold text-teal-800">
+      <p className="text-xl text-center font-bold text-teal-500">
         Total Followings: {userFollowers?.length} person
       </p>
       {userFollowers?.map((following) => (

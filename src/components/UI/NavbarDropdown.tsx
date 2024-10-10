@@ -11,10 +11,17 @@ import { Avatar } from "@nextui-org/avatar";
 import { logout } from "@/src/services/AuthService";
 import { useUser } from "@/src/context/user.provider";
 import Swal from "sweetalert2"; // Import SweetAlert
+import Link from "next/link";
 
 export default function NavbarDropdown() {
   const router = useRouter();
   const { user, setIsLoading: userLoading } = useUser();
+
+  // Route map based on user roles
+  const routeMap: Record<string, string> = {
+    user: "/dashboard",
+    admin: "/admin-dashboard",
+  };
 
   const handleLogout = () => {
     // Show SweetAlert confirmation before logging out
@@ -54,8 +61,13 @@ export default function NavbarDropdown() {
         <DropdownItem onClick={() => handleNavigation("/profile")}>
           My Profile
         </DropdownItem>
-        <DropdownItem onClick={() => handleNavigation("/dashboard")}>
-          Dashboard
+
+        <DropdownItem>
+          {user && (
+            <Link href={routeMap[user?.role]} passHref>
+              Dashboard
+            </Link>
+          )}
         </DropdownItem>
 
         <DropdownItem
