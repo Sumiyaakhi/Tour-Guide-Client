@@ -11,14 +11,14 @@ const UserPosts: React.FC = () => {
   const isAuthenticated = !!user;
 
   // Use the custom hook to fetch my posts
-  const { data: myPosts, isLoading, error } = useGetMyPosts();
-
+  const { data, isLoading, isError } = useGetMyPosts();
+  const myPosts = data?.data || []; //
   if (isLoading) {
     return <div>Loading...</div>; // You can replace this with a loading spinner or a skeleton component
   }
 
-  if (error) {
-    return <div>Error fetching posts: {error.message}</div>; // Display error message
+  if (isError) {
+    return <div>Error fetching posts:</div>; // Display error message
   }
 
   return (

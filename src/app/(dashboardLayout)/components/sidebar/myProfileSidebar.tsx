@@ -31,6 +31,7 @@ export const AdminSidebarWrapper = () => {
             src={img}
             alt="travel logo"
             height={50}
+            width={50}
           />
           <p className="md:text-xl text-teal-500 font-brand">Wayfarer World</p>
         </div>

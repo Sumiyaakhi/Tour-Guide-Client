@@ -44,6 +44,7 @@ export const SidebarWrapper = () => {
             src={img}
             alt="travel logo"
             height={50}
+            width={50}
           />
           <p className="md:text-xl text-teal-700 font-brand">Wayfarer World</p>
         </div>

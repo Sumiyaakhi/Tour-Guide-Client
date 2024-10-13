@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Button } from "@nextui-org/button";
 import { useUser } from "@/src/context/user.provider";
@@ -12,19 +12,29 @@ import { IUser } from "@/src/types";
 import ProfileUpdate from "./ProfileUpdate";
 import TabsComponent from "./TabsComponent";
 import { useGetMyPosts } from "@/src/hooks/post.hook";
+import { getAllUsers } from "@/src/services/RecentPosts";
 
-interface MyProfileProps {
-  allUsers: IUser[];
-}
-
-const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
+const MyProfile = () => {
   const { user, setUser, token } = useUser();
   const [loading, setLoading] = useState(false);
+  const [allUsers, setAllUsers] = useState<IUser[]>([]);
   const { data, isLoading, isError } = useGetMyPosts();
   const myPosts = data?.data || []; // Safely access data here
   console.log(myPosts);
   const totalUpvotes = 10; // Replace with a proper calculation if needed.
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        const { data: users } = await getAllUsers();
+        setAllUsers(users || []);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
 
+    fetchAllUsers();
+  }, []); // Safely access data here
+  console.log(myPosts);
   // Get all users except the current user
   const allUsersExceptCurrent = allUsers.filter(
     (Tuser) => Tuser._id !== user?._id
@@ -75,7 +85,7 @@ const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
             {/* Profile Picture */}
             <div className="flex justify-center my-4">
               <Avatar
-                src={user?.img || "/default-avatar.png"}
+                src={user?.img}
                 className="md:w-64 md:h-64 rounded-full border-2 border-gray-300"
               />
             </div>

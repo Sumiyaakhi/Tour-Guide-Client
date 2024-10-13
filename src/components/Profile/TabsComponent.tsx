@@ -47,7 +47,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
                 ) : (
                   myPosts.map((post) => (
                     <PostCard
-                      key={post._id}
+                      key={post?._id}
                       post={post}
                       isAuthenticated={true}
                     />
@@ -76,9 +76,11 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
                   >
                     {/* Follower Image */}
                     <Image
-                      src={follower?.img || "/default-avatar.png"}
+                      src={follower?.img}
                       alt={`${follower?.name}'s profile`}
                       className="w-12 h-12 rounded-full"
+                      width={50}
+                      height={50}
                     />
                     {/* Follower Details */}
                     <div>
@@ -119,9 +121,11 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
                   >
                     {/* Follower Image */}
                     <Image
-                      src={following?.img || "/default-avatar.png"}
+                      src={following?.img}
                       alt={`${following?.name}'s profile`}
                       className="w-12 h-12 rounded-full"
+                      width={50}
+                      height={50}
                     />
                     {/* Follower Details */}
                     <div>
@@ -165,9 +169,11 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
                     <div className="follower-item flex items-center gap-4 mb-4">
                       {/* Follower Image */}
                       <Image
-                        src={Tuser?.img || "/default-avatar.png"}
+                        src={Tuser?.img as string}
                         alt={`${Tuser?.name}'s profile`}
                         className="w-12 h-12 rounded-full"
+                        width={50}
+                        height={50}
                       />
                       {/* Follower Details */}
                       <div>

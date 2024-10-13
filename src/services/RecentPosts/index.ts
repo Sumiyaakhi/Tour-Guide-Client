@@ -14,3 +14,11 @@ export const getRecentPosts = async () => {
 
   return res.json();
 };
+
+export const getAllUsers = async () => {
+  const res = await fetch(`${envConfig.baseApi}/auth/users`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch users");
+  }
+  return res.json();
+};
