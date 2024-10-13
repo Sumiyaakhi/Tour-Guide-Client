@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react"; // Import useEffect
 import Swal from "sweetalert2";
 import { Button } from "@nextui-org/button";
 import { useUser } from "@/src/context/user.provider";
@@ -11,32 +11,22 @@ import { followUser, verifyUser } from "@/src/services/UserApi";
 import { IUser, TPost } from "@/src/types";
 import ProfileUpdate from "./ProfileUpdate";
 import TabsComponent from "./TabsComponent";
+import { useGetMyPosts } from "@/src/hooks/post.hook";
 
 interface MyProfileProps {
-  myPosts: TPost[];
   allUsers: IUser[];
 }
-interface TUser {
-  _id: string;
-  name: string;
-  email: string;
-  bio?: string;
-  verified: boolean;
-  followings: string[];
-  followers: string[];
-  img?: string;
-  [key: string]: any; // Allow other dynamic fields if needed
-}
 
-const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
+const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
   const { user, setUser, token } = useUser(); // Make sure token is retrieved from context
   const [loading, setLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string>();
+  const { data: myPosts = [], isLoading, isError } = useGetMyPosts(); // Destructure to get myPosts and states
 
   // Get total upvotes for the user's posts
-  const getTotalUpvotes = (myPosts: TPost[]) => {
-    return myPosts.reduce((total, post) => total + (post.upvote || 0), 0);
+  const getTotalUpvotes = (posts: TPost[]) => {
+    return posts.reduce((total, post) => total + (post.upvote || 0), 0);
   };
+
   const totalUpvotes = getTotalUpvotes(myPosts);
 
   // Get all users except the current user
@@ -89,7 +79,7 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
             {/* Profile Picture */}
             <div className="flex justify-center my-4">
               <Avatar
-                src={imagePreview || user?.img || "/default-avatar.png"} // Fallback image
+                src={user?.img || "/default-avatar.png"} // Fallback image
                 className="md:w-64 md:h-64 rounded-full border-2 border-gray-300"
               />
             </div>

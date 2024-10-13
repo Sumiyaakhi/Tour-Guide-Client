@@ -6,7 +6,7 @@ import envConfig from "@/src/config/envConfig";
 import { getCurrentUser } from "../AuthService";
 
 // Helper to get access token from local storage
-const getToken = () => localStorage.getItem("accessToken"); // or sessionStorage.getItem("accessToken");
+const getToken = () => localStorage.getItem("accessToken");
 
 export const createPost = async (formData: FormData): Promise<any> => {
   try {
@@ -16,14 +16,17 @@ export const createPost = async (formData: FormData): Promise<any> => {
     const { data } = await axiosInstance.post("/post", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`, // Include Bearer token
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    revalidateTag("posts"); // Refresh the post cache after creation
+    revalidateTag("posts");
     return data;
-  } catch (error) {
-    console.error("Failed to create post", error);
+  } catch (error: any) {
+    console.error(
+      "Failed to create post:",
+      error.response?.data || error.message
+    );
     throw new Error("Failed to create post");
   }
 };
@@ -37,17 +40,18 @@ export const getPost = async (postId: string) => {
     const res = await fetch(`${envConfig.baseApi}/post/${postId}`, {
       cache: "no-store",
       headers: {
-        Authorization: `Bearer ${token}`, // Include Bearer token
+        Authorization: `Bearer ${token}`,
       },
     });
 
     if (!res.ok) {
-      throw new Error("Failed to fetch post");
+      const errorData = await res.json();
+      throw new Error(`Failed to fetch post: ${errorData.message}`);
     }
 
     return res.json();
   } catch (error) {
-    console.error("Failed to fetch post", error);
+    console.error("Failed to fetch post:", error);
     throw new Error("Failed to fetch post");
   }
 };
@@ -55,23 +59,16 @@ export const getPost = async (postId: string) => {
 // Get all posts
 export const getAllPosts = async () => {
   try {
-    const token = getToken();
-    if (!token) throw new Error("User not authenticated");
-
-    const res = await fetch(`${envConfig.baseApi}/post`, {
-      cache: "no-store",
-      headers: {
-        Authorization: `Bearer ${token}`, // Include Bearer token
-      },
-    });
+    const res = await fetch(`${envConfig.baseApi}/post`);
 
     if (!res.ok) {
-      throw new Error("Failed to fetch all posts");
+      const errorData = await res.json();
+      throw new Error(`Failed to fetch all posts: ${errorData.message}`);
     }
 
     return res.json();
   } catch (error) {
-    console.error("Failed to fetch all posts", error);
+    console.error("Failed to fetch all posts:", error);
     throw new Error("Failed to fetch all posts");
   }
 };
@@ -87,12 +84,12 @@ export const getMyPosts = async () => {
 
     const { data } = await axiosInstance.get(`/post?user=${user._id}`, {
       headers: {
-        Authorization: `Bearer ${token}`, // Include Bearer token
+        Authorization: `Bearer ${token}`,
       },
     });
     return data;
   } catch (error) {
-    console.error("Failed to fetch user's posts", error);
+    console.error("Failed to fetch user's posts:", error);
     throw new Error("Failed to fetch user's posts");
   }
 };
@@ -109,14 +106,14 @@ export const updatePost = async (
     const { data } = await axiosInstance.put(`/post/${postId}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`, // Include Bearer token
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    revalidateTag("post"); // Refresh the post cache after update
+    revalidateTag("post");
     return data;
   } catch (error) {
-    console.error("Failed to update post", error);
+    console.error("Failed to update post:", error);
     throw new Error("Failed to update post");
   }
 };
@@ -129,14 +126,14 @@ export const deletePost = async (postId: string): Promise<any> => {
 
     const { data } = await axiosInstance.delete(`/post/${postId}`, {
       headers: {
-        Authorization: `Bearer ${token}`, // Include Bearer token
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    revalidateTag("post"); // Refresh the post cache after deletion
+    revalidateTag("post");
     return data;
   } catch (error) {
-    console.error("Failed to delete post", error);
+    console.error("Failed to delete post:", error);
     throw new Error("Failed to delete post");
   }
 };
@@ -149,18 +146,18 @@ export const updateIncUpvote = async (postId: string) => {
 
     const { data } = await axiosInstance.put(
       `/post/upvoteInc/${postId}`,
-      {}, // No payload needed for upvote
+      {},
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    revalidateTag("post"); // Refresh the post cache after upvote
+    revalidateTag("post");
     return data;
   } catch (error) {
-    console.error("Failed to upvote post", error);
+    console.error("Failed to upvote post:", error);
     throw new Error("Failed to upvote post");
   }
 };
@@ -173,18 +170,18 @@ export const updateDecUpvote = async (postId: string) => {
 
     const { data } = await axiosInstance.put(
       `/post/upvoteDec/${postId}`,
-      {}, // No payload needed for decrement
+      {},
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    revalidateTag("post"); // Refresh the post cache after decrement
+    revalidateTag("post");
     return data;
   } catch (error) {
-    console.error("Failed to decrement upvote", error);
+    console.error("Failed to decrement upvote:", error);
     throw new Error("Failed to decrement upvote");
   }
 };
@@ -197,18 +194,18 @@ export const updateIncDownvote = async (postId: string) => {
 
     const { data } = await axiosInstance.put(
       `/post/downvoteInc/${postId}`,
-      {}, // No payload needed for downvote
+      {},
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    revalidateTag("post"); // Refresh the post cache after downvote
+    revalidateTag("post");
     return data;
   } catch (error) {
-    console.error("Failed to downvote post", error);
+    console.error("Failed to downvote post:", error);
     throw new Error("Failed to downvote post");
   }
 };
@@ -221,18 +218,18 @@ export const updateDecDownvote = async (postId: string) => {
 
     const { data } = await axiosInstance.put(
       `/post/downvoteDec/${postId}`,
-      {}, // No payload needed for decrement
+      {},
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    revalidateTag("post"); // Refresh the post cache after decrement
+    revalidateTag("post");
     return data;
   } catch (error) {
-    console.error("Failed to decrement downvote", error);
+    console.error("Failed to decrement downvote:", error);
     throw new Error("Failed to decrement downvote");
   }
 };
@@ -255,15 +252,15 @@ export const addOrUpdateComment = async (
       },
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    revalidateTag("post"); // Refresh the post cache after comment update
+    revalidateTag("post");
     return data;
   } catch (error) {
-    console.error("Failed to update comment", error);
+    console.error("Failed to update comment:", error);
     throw new Error("Failed to update comment");
   }
 };
@@ -278,15 +275,15 @@ export const deleteComment = async (postId: string, commentId: string) => {
       `/post/${postId}/comment/${commentId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    revalidateTag("post"); // Refresh the post cache after comment deletion
+    revalidateTag("post");
     return data;
   } catch (error) {
-    console.error("Failed to delete comment", error);
+    console.error("Failed to delete comment:", error);
     throw new Error("Failed to delete comment");
   }
 };

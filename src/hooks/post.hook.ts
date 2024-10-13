@@ -5,6 +5,7 @@ import {
   createPost,
   deleteComment,
   deletePost,
+  getAllPosts,
   getMyPosts,
   updateDecDownvote,
   updateDecUpvote,
@@ -12,6 +13,7 @@ import {
   updateIncUpvote,
   updatePost,
 } from "../services/PostApi";
+import { TPost } from "../types";
 
 // Hook to create a post
 export const useCreatePost = () => {
@@ -166,5 +168,12 @@ export const useGetMyPosts = () => {
   return useQuery<any, Error>({
     queryKey: ["GET_MY_POSTS"],
     queryFn: async () => await getMyPosts(),
+  });
+};
+
+export const useGetAllPosts = () => {
+  return useQuery<TPost[], Error>({
+    queryKey: ["GET_ALL_POSTS"],
+    queryFn: async () => await getAllPosts(),
   });
 };

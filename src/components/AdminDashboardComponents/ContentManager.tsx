@@ -8,8 +8,10 @@ import ImageGallery from "../Posts/ImageGallery";
 import { Trash2 } from "lucide-react";
 import { deletePost } from "@/src/services/PostApi";
 import Swal from "sweetalert2";
+import { useGetAllPosts } from "@/src/hooks/post.hook";
 
 const ContentManager = ({ post }: { post: TPost }) => {
+  const { data: posts, isLoading, error } = useGetAllPosts();
   const handleDeletePost = async () => {
     const result = await Swal.fire({
       title: "Are you sure?",
