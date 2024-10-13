@@ -1,15 +1,13 @@
-"use server";
+"use client";
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 import { revalidateTag } from "next/cache";
 import envConfig from "@/src/config/envConfig";
-import { cookies } from "next/headers";
 import { getCurrentUser } from "../AuthService";
 
-// Helper to get access token
-const getToken = () => cookies().get("accessToken")?.value || null;
+// Helper to get access token from local storage
+const getToken = () => localStorage.getItem("accessToken"); // or sessionStorage.getItem("accessToken");
 
-// Create a post
 export const createPost = async (formData: FormData): Promise<any> => {
   try {
     const token = getToken();

@@ -1,12 +1,10 @@
-"use server";
-
 import ContentManager from "@/src/components/AdminDashboardComponents/ContentManager";
 import { getAllPosts } from "@/src/services/PostApi";
 import { TPost } from "@/src/types";
 import React from "react";
 
 const ContentmanagerPage = async () => {
-  // Await the result of the async function
+  //   // Await the result of the async function
   const { data: posts } = await getAllPosts();
 
   return (

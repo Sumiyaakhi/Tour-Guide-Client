@@ -1,3 +1,5 @@
+"use client";
+
 import React, { ChangeEvent, useState, useEffect } from "react";
 import {
   Modal,
@@ -75,10 +77,17 @@ const ProfileUpdate = () => {
     formData.append("data", JSON.stringify(updateData));
 
     try {
+      const token = localStorage.getItem("accessToken"); // Retrieve the token from localStorage
+
+      if (!token) {
+        throw new Error("No access token found. Please log in again.");
+      }
+
       // Update profile through API
       const updatedUser = await updateUserProfile(
         user?._id as string,
-        formData
+        formData,
+        token
       );
 
       setUser(updatedUser); // Immediately update user context with new data
@@ -103,7 +112,6 @@ const ProfileUpdate = () => {
       Swal.fire("Error", "Failed to update profile!", "error");
     }
   };
-
   return (
     <>
       {/* Trigger Button to Open Modal */}

@@ -2,14 +2,14 @@
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 import { revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
-
-// Follow a user
 
 // Verify a user (Admin only)
-export const verifyUser = async (userId: string): Promise<any> => {
+export const verifyUser = async (
+  userId: string,
+  token: string
+): Promise<any> => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.patch(
       `/auth/verify/${userId}`,
@@ -32,10 +32,11 @@ export const verifyUser = async (userId: string): Promise<any> => {
 // Update profile details
 export const updateUserProfile = async (
   userId: string,
-  formData: FormData
+  formData: FormData,
+  token: string
 ): Promise<any> => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.put(`/auth/user/${userId}`, formData, {
       headers: {
@@ -55,10 +56,11 @@ export const updateUserProfile = async (
 // Follow a user
 export const followUser = async (
   targetUserId: string,
-  currentUserId: string
+  currentUserId: string,
+  token: string
 ): Promise<any> => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.post(
       "/auth/follow", // Endpoint for following a user
@@ -81,14 +83,15 @@ export const followUser = async (
 // Update user role
 export const updateUserRole = async (
   userId: string,
-  newRole: "admin" | "user"
+  newRole: "admin" | "user",
+  token: string
 ): Promise<any> => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.patch(
       `/auth/user/${userId}`, // Endpoint for updating user role
-      { role: newRole }, // Sending the userId and the new role in the request body
+      { role: newRole }, // Sending the new role in the request body
       {
         headers: {
           Authorization: `Bearer ${token}`, // Include Bearer token for authorization
@@ -103,11 +106,14 @@ export const updateUserRole = async (
     throw new Error("Failed to update user role");
   }
 };
-// Update user role
+
 // Delete user
-export const deleteUser = async (userId: string): Promise<any> => {
+export const deleteUser = async (
+  userId: string,
+  token: string
+): Promise<any> => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.delete(
       `/auth/${userId}`, // Endpoint for deleting a user by userId

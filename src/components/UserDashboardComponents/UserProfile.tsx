@@ -29,21 +29,27 @@ const UserProfile: React.FC<MyProfileProps> = ({ myPosts }) => {
   // Verify user logic
   const handleVerify = async () => {
     try {
-      const res = await verifyUser(user?._id as string);
+      setLoading(true); // Optional: Show loading state
+      const token = user?.token; // Adjust this line to retrieve the token correctly
+      const res = await verifyUser(user?._id as string, token); // Pass both userId and token
       window.location.href = res.data.paymentSession.paymentUrl;
     } catch (error) {
       console.error("Error verifying user", error);
       Swal.fire("Error", "Failed to verify user!", "error");
+    } finally {
+      setLoading(false); // Reset loading state after completion
     }
   };
+
   const isVerified = user?.verified || false;
+
   return (
     <div>
       <div className="">
-        <div className=" w-full">
+        <div className="w-full">
           {/* Profile Card - fixed for md and larger screens */}
-          <div className="w-full max-w-4xl mx-auto  text-teal-800">
-            <div className="rounded-lg shadow-lg p-6 ">
+          <div className="w-full max-w-4xl mx-auto text-teal-800">
+            <div className="rounded-lg shadow-lg p-6">
               {/* Profile Picture */}
               <div className="flex justify-center my-4">
                 <Avatar
@@ -56,7 +62,7 @@ const UserProfile: React.FC<MyProfileProps> = ({ myPosts }) => {
                 {user ? (
                   <>
                     <div className="flex gap-2 justify-center items-center">
-                      <h1 className="text-3xl  font-bold mb-2">{user?.name}</h1>
+                      <h1 className="text-3xl font-bold mb-2">{user?.name}</h1>
                       {isVerified && (
                         <div className="flex gap-1">
                           <MdVerified className="w-6 h-6 text-blue-700 ml-2" />
@@ -65,14 +71,14 @@ const UserProfile: React.FC<MyProfileProps> = ({ myPosts }) => {
                       )}
                     </div>
                     <p className="">{user?.email || "No email available"}</p>
-                    <p className=" mt-2">{user?.bio || "No bio available"}</p>
+                    <p className="mt-2">{user?.bio || "No bio available"}</p>
                   </>
                 ) : (
                   <p className="">No user data available</p>
                 )}
 
                 {/* Follow and Verify Buttons */}
-                <div className="flex justify-between gap-4 mt-4 ">
+                <div className="flex justify-between gap-4 mt-4">
                   {totalUpvotes > 0 && (
                     <Button
                       className="font-bold btn-primary"
@@ -91,7 +97,7 @@ const UserProfile: React.FC<MyProfileProps> = ({ myPosts }) => {
                 </div>
 
                 {/* Followers and followings count */}
-                <div className="grid grid-cols-1  md:grid-cols-2 md:gap-4 lg:gap-7 font-bold py-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:gap-7 font-bold py-5">
                   <h3>Followers {user?.followers?.length || 0}</h3>
                   <h3>Followings {user?.followings?.length || 0}</h3>
                 </div>

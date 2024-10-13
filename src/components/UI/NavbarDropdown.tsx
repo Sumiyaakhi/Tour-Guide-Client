@@ -16,6 +16,7 @@ import Link from "next/link";
 export default function NavbarDropdown() {
   const router = useRouter();
   const { user, setIsLoading: userLoading } = useUser();
+  console.log(user);
 
   // Route map based on user roles
   const routeMap: Record<string, string> = {
@@ -62,17 +63,19 @@ export default function NavbarDropdown() {
           My Profile
         </DropdownItem>
 
-        <DropdownItem>
-          {user && (
-            <Link href={routeMap[user?.role]} passHref>
-              Dashboard
-            </Link>
+        <>
+          {user?.role && routeMap[user.role] && (
+            <DropdownItem>
+              <Link href={routeMap[user.role]} passHref>
+                <span className="w-full">Dashboard</span>
+              </Link>
+            </DropdownItem>
           )}
-        </DropdownItem>
+        </>
 
         <DropdownItem
-          onClick={() => handleLogout()}
-          key="delete"
+          onClick={handleLogout}
+          key="logout"
           className="text-danger"
           color="danger"
         >

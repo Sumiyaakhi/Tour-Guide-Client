@@ -29,7 +29,7 @@ interface TUser {
 }
 
 const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
-  const { user, setUser } = useUser();
+  const { user, setUser, token } = useUser(); // Make sure token is retrieved from context
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>();
 
@@ -47,8 +47,13 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
   // Follow/Unfollow logic
   const handleToggleFollowUser = async (targetUserId: string) => {
     try {
+      if (!token) throw new Error("User not authenticated");
       setLoading(true);
-      const response = await followUser(targetUserId, user?._id as string);
+      const response = await followUser(
+        targetUserId,
+        user?._id as string,
+        token
+      );
       const { currentUser, message } = response;
 
       Swal.fire("Success", message, "success");
@@ -63,7 +68,8 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
   // Verify user logic
   const handleVerify = async () => {
     try {
-      const res = await verifyUser(user?._id as string);
+      if (!token) throw new Error("User not authenticated");
+      const res = await verifyUser(user?._id as string, token);
       window.location.href = res.data.paymentSession.paymentUrl;
     } catch (error) {
       console.error("Error verifying user", error);

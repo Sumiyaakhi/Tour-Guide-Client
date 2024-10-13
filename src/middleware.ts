@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { jwtDecode } from "jwt-decode";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const authRoutes = ["/login", "/register"];
@@ -8,14 +7,17 @@ const authRoutes = ["/login", "/register"];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const accessToken = cookies().get("accessToken")?.value;
+  // Extract the access token from request headers
+  const accessToken = request.headers
+    .get("Authorization")
+    ?.replace("Bearer ", "");
 
   if (!accessToken) {
-    //Protecting hybrid routes
+    // Allow access to authentication routes
     if (authRoutes.includes(pathname)) {
       return NextResponse.next();
     } else {
-      //   return NextResponse.redirect(new URL("/login", request.url));
+      // Redirect to login with the original path as a redirect parameter
       return NextResponse.redirect(
         new URL(
           pathname ? `/login?redirect=${pathname}` : "/login",
@@ -25,43 +27,36 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  //Role based authorization
+  // Decode the access token to check user role
+  let decodedToken: any = null;
 
-  let decodedToken = null;
-
-  decodedToken = jwtDecode(accessToken) as any;
+  try {
+    decodedToken = jwtDecode(accessToken); // Decode using jwt-decode
+  } catch (error) {
+    console.error("Token decoding failed", error);
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
   const role = decodedToken?.role;
 
-  // /admin-dashboard - ok
-  // /admin-dashboard/car-management - ok
+  // Role-based authorization
+  // Allow access to admin routes
   if (role === "admin" && pathname.match(/^\/admin-dashboard/)) {
     return NextResponse.next();
   }
 
-  // /dashboard , /dashboard/my-requested-rides , /profile
+  // Allow access to user routes
   if (role === "user" && pathname.match(/^\/dashboard/)) {
     return NextResponse.next();
   }
 
+  // Redirect to home page if the user does not have the necessary permissions
   return NextResponse.redirect(new URL("/", request.url));
-
-  //decodedToken.role
 }
-
-//!accessToken -> /login -> jete dao
 
 export const config = {
   matcher: [
-    "/login",
-    "/register",
-    "/dashboard/:page*",
-    "/admin-dashboard/:page*",
+    "/dashboard/:page*", // Match all dashboard sub-routes
+    "/admin-dashboard/:page*", // Match all admin dashboard sub-routes
   ],
 };
-
-//public - cars
-//private - admin, driver, user
-//hybrid - login, register
-
-//middleware.ts (dashboard, admin-dashboard) -> layout.tsx -> page.tax / dashboard/page.tsx

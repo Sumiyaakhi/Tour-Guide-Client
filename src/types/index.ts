@@ -33,7 +33,7 @@ export interface IUser {
   password?: string;
   phone: string;
   img?: string;
-  role: "admin" | "user";
+  role?: "admin" | "user";
   address?: string;
   premium?: boolean;
   verified?: boolean;

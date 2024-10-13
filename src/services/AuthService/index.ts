@@ -1,16 +1,35 @@
-"use server";
+"use client";
 
 import axiosInstance from "@/src/lib/AxiosInstance";
-import { jwtDecode } from "jwt-decode";
-import { cookies } from "next/headers";
+import { TFollower } from "@/src/types";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 import { FieldValues } from "react-hook-form";
+
+// Define a custom interface for your JWT payload
+interface CustomJwtPayload extends JwtPayload {
+  sub: string; // Add the required properties
+  name: string;
+  email: string;
+  phone: string;
+  role: "admin" | "user";
+  address: string;
+  img: string;
+  bio: string;
+  verified: boolean;
+  followers: TFollower[]; // or the appropriate type
+  followings: TFollower[]; // or the appropriate type
+}
 
 export const registerUser = async (userData: FieldValues) => {
   try {
     const { data } = await axiosInstance.post("/auth/signup", userData);
     if (data.success) {
-      cookies().set("accessToken", data?.data?.accessToken);
-      cookies().set("refreshToken", data?.data?.refreshToken);
+      // Store tokens in localStorage or sessionStorage
+      localStorage.setItem("accessToken", data?.data?.accessToken);
+      localStorage.setItem("refreshToken", data?.data?.refreshToken);
+      // Alternatively, use sessionStorage if you want tokens to expire after the session
+      // sessionStorage.setItem("accessToken", data?.data?.accessToken);
+      // sessionStorage.setItem("refreshToken", data?.data?.refreshToken);
     }
 
     return data;
@@ -18,12 +37,17 @@ export const registerUser = async (userData: FieldValues) => {
     throw new Error(error);
   }
 };
+
 export const loginUser = async (userData: FieldValues) => {
   try {
     const { data } = await axiosInstance.post("/auth/login", userData);
     if (data.success) {
-      cookies().set("accessToken", data?.accessToken);
-      cookies().set("refreshToken", data?.refreshToken);
+      // Store tokens in localStorage or sessionStorage
+      localStorage.setItem("accessToken", data?.accessToken);
+      localStorage.setItem("refreshToken", data?.refreshToken);
+      // Alternatively, use sessionStorage if you want tokens to expire after the session
+      // sessionStorage.setItem("accessToken", data?.accessToken);
+      // sessionStorage.setItem("refreshToken", data?.refreshToken);
     }
 
     return data;
@@ -33,12 +57,12 @@ export const loginUser = async (userData: FieldValues) => {
 };
 
 export const getCurrentUser = async () => {
-  const accessToken = cookies().get("accessToken")?.value;
+  const accessToken = localStorage.getItem("accessToken"); // or sessionStorage.getItem("accessToken");
 
-  let decodedToken = null;
+  let decodedToken: CustomJwtPayload | null = null; // Use the custom payload type
 
   if (accessToken) {
-    decodedToken = await jwtDecode(accessToken);
+    decodedToken = jwtDecode<CustomJwtPayload>(accessToken); // Decode using the custom type
     return {
       _id: decodedToken.sub,
       name: decodedToken.name,
@@ -58,6 +82,9 @@ export const getCurrentUser = async () => {
 };
 
 export const logout = () => {
-  cookies().delete("accessToken");
-  cookies().delete("refreshToken");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  // If using sessionStorage, you can clear those as well
+  // sessionStorage.removeItem("accessToken");
+  // sessionStorage.removeItem("refreshToken");
 };

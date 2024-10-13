@@ -12,13 +12,27 @@ const UserFollowers = () => {
   const { user, setUser } = useUser();
   const [loading, setLoading] = useState(false);
   const userFollowers = user?.followers;
+
+  // Ensure you have access to the token; assuming it's in user context
+  const token = user?.token; // Make sure your user context provides the token
+
   const handleToggleFollowUser = async (targetUserId: string) => {
+    if (!token) {
+      Swal.fire("Error", "User token is missing!", "error");
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await followUser(targetUserId, user?._id as string);
+      const response = await followUser(
+        targetUserId,
+        user?._id as string,
+        token
+      ); // Include token here
       const { currentUser, message } = response;
 
       Swal.fire("Success", message, "success");
+      setUser(currentUser); // Update the user context with the current user
     } catch (error) {
       console.error("Error toggling follow/unfollow", error);
       Swal.fire("Error", "Failed to follow/unfollow!", "error");
@@ -26,6 +40,7 @@ const UserFollowers = () => {
       setLoading(false);
     }
   };
+
   return (
     <div className="max-w-5xl mx-auto gap-6 grid grid-cols-1 ">
       <p className="text-xl text-center font-bold text-teal-500">
@@ -70,10 +85,10 @@ const UserFollowers = () => {
                     </p>
                     <Button
                       className="btn-primary my-5"
-                      onClick={() => handleToggleFollowUser(following?._id)} // Pass the full Tuser object
+                      onClick={() => handleToggleFollowUser(following?._id)} // Pass the following user's ID
                       disabled={loading}
                     >
-                      {user?.followings?.some((f) => f._id === user?._id)
+                      {user?.followings?.some((f) => f._id === following._id)
                         ? "Unfollow"
                         : "Follow"}
                     </Button>

@@ -20,12 +20,12 @@ import {
 import Swal from "sweetalert2";
 import { IUser } from "@/src/types";
 import { Trash2 } from "lucide-react";
-import { deleteUser, updateUserRole } from "@/src/services/UserApi";
+import { deleteUser, updateUserRole } from "@/src/services/UserApi"; // Import the server-side functions
 
 // Utility function to get dynamic key-value
 const getKeyValue = (obj: IUser, key: keyof IUser) => obj[key];
 
-// Updated status color map with valid color types
+// Status color map with valid color types
 const statusColorMap: Record<
   string,
   "success" | "danger" | "warning" | "default" | "primary" | "secondary"
@@ -35,10 +35,14 @@ const statusColorMap: Record<
   vacation: "warning",
 };
 
-const UserManagement = ({ allUsers }: { allUsers: IUser[] }) => {
+const UserManagement = ({
+  allUsers,
+  token,
+}: {
+  allUsers: IUser[];
+  token: string; // Pass token as a prop for server requests
+}) => {
   const [users, setUsers] = useState<IUser[]>(allUsers);
-  const [newRole, setNewRole] = useState<string>("");
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Handle role update
   const handleRoleUpdate = async (userId: string, role: "admin" | "user") => {
@@ -52,7 +56,7 @@ const UserManagement = ({ allUsers }: { allUsers: IUser[] }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await updateUserRole(userId, role);
+          await updateUserRole(userId, role, token);
 
           // Update role in the local state
           setUsers((prevUsers) =>
@@ -80,7 +84,7 @@ const UserManagement = ({ allUsers }: { allUsers: IUser[] }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteUser(userId);
+          await deleteUser(userId, token);
 
           // Remove user from the local state
           setUsers((prevUsers) =>
@@ -144,7 +148,7 @@ const UserManagement = ({ allUsers }: { allUsers: IUser[] }) => {
           <div className="flex flex-col">
             <Chip
               className="capitalize"
-              color={statusColorMap[user?.role] || "default"}
+              // color={statusColorMap[user?.role] || "default"}
               size="sm"
               variant="flat"
             >
@@ -153,7 +157,6 @@ const UserManagement = ({ allUsers }: { allUsers: IUser[] }) => {
           </div>
         );
       default:
-        // Ensure cellValue is of a renderable type
         return typeof cellValue === "string" || typeof cellValue === "number"
           ? cellValue
           : null;
@@ -162,9 +165,9 @@ const UserManagement = ({ allUsers }: { allUsers: IUser[] }) => {
 
   return (
     <div className="p-6">
-      <h1 className="md:text-3xl  font-bold mb-4">User Management</h1>
-      <h4 className="md:text-xl  font-bold mb-4">
-        Total User(s) : {allUsers.length}
+      <h1 className="md:text-3xl font-bold mb-4">User Management</h1>
+      <h4 className="md:text-xl font-bold mb-4">
+        Total User(s) : {users.length}
       </h4>
       <Table aria-label="User management table">
         <TableHeader>

@@ -1,5 +1,3 @@
-"use server";
-
 import MyProfile from "@/src/components/Profile/MyProfile";
 import axiosInstance from "@/src/lib/AxiosInstance";
 import { getMyPosts } from "@/src/services/PostApi";

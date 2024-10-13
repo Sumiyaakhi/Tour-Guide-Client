@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { FaFacebookF, FaLinkedinIn, FaGoogle } from "react-icons/fa";
 import { motion } from "framer-motion"; // Import Framer Motion
@@ -47,9 +47,8 @@ const Register = () => {
   });
 
   const onSubmit = (data: FormData) => {
-    handleUserRegistration(data);
     userLoading(true);
-    // Send data to your backend or API here
+    handleUserRegistration(data);
   };
 
   useEffect(() => {
@@ -60,7 +59,7 @@ const Register = () => {
         router.push("/");
       }
     }
-  }, [isPending, isSuccess]);
+  }, [isPending, isSuccess, redirect, router]);
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-50">
@@ -189,4 +188,11 @@ const Register = () => {
   );
 };
 
-export default Register;
+// Wrap the Register component in Suspense
+const RegisterWrapper = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <Register />
+  </Suspense>
+);
+
+export default RegisterWrapper;
