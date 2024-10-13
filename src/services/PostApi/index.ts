@@ -82,7 +82,7 @@ export const getMyPosts = async () => {
     const token = getToken();
     if (!token) throw new Error("User not authenticated");
 
-    const { data } = await axiosInstance.get(`/post?user=${user._id}`, {
+    const { data } = await axiosInstance.get(`/post?user=${user?._id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

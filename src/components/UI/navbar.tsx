@@ -22,6 +22,7 @@ import NavbarDropdown from "./NavbarDropdown";
 
 export const Navbar = () => {
   const { user } = useUser();
+  console.log("user from navbar", user);
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href;
 

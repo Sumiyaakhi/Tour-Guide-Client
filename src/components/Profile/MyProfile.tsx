@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react"; // Import useEffect
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { Button } from "@nextui-org/button";
 import { useUser } from "@/src/context/user.provider";
 import { Avatar } from "@nextui-org/avatar";
 import { MdVerified } from "react-icons/md";
-import { BsStars } from "react-icons/bs"; // For premium badge icon
+import { BsStars } from "react-icons/bs";
 import { followUser, verifyUser } from "@/src/services/UserApi";
-import { IUser, TPost } from "@/src/types";
+import { IUser } from "@/src/types";
 import ProfileUpdate from "./ProfileUpdate";
 import TabsComponent from "./TabsComponent";
 import { useGetMyPosts } from "@/src/hooks/post.hook";
@@ -18,16 +18,12 @@ interface MyProfileProps {
 }
 
 const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
-  const { user, setUser, token } = useUser(); // Make sure token is retrieved from context
+  const { user, setUser, token } = useUser();
   const [loading, setLoading] = useState(false);
-  const { data: myPosts = [], isLoading, isError } = useGetMyPosts(); // Destructure to get myPosts and states
-
-  // Get total upvotes for the user's posts
-  const getTotalUpvotes = (posts: TPost[]) => {
-    return posts.reduce((total, post) => total + (post.upvote || 0), 0);
-  };
-
-  const totalUpvotes = getTotalUpvotes(myPosts);
+  const { data, isLoading, isError } = useGetMyPosts();
+  const myPosts = data?.data || []; // Safely access data here
+  console.log(myPosts);
+  const totalUpvotes = 10; // Replace with a proper calculation if needed.
 
   // Get all users except the current user
   const allUsersExceptCurrent = allUsers.filter(
@@ -46,6 +42,7 @@ const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
       );
       const { currentUser, message } = response;
 
+      setUser(currentUser); // Update the user context with the new follow data
       Swal.fire("Success", message, "success");
     } catch (error) {
       console.error("Error toggling follow/unfollow", error);
@@ -67,19 +64,18 @@ const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
     }
   };
 
-  // Check if user is verified
   const isVerified = user?.verified || false;
 
   return (
-    <div className="">
+    <div>
       <div className="bg-black w-full pt-24">
-        {/* Profile Card - fixed for md and larger screens */}
+        {/* Profile Card */}
         <div className="w-full max-w-4xl mx-auto">
           <div className="rounded-lg shadow-lg p-6 grid grid-cols-1 md:grid-cols-2">
             {/* Profile Picture */}
             <div className="flex justify-center my-4">
               <Avatar
-                src={user?.img || "/default-avatar.png"} // Fallback image
+                src={user?.img || "/default-avatar.png"}
                 className="md:w-64 md:h-64 rounded-full border-2 border-gray-300"
               />
             </div>
@@ -115,7 +111,7 @@ const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
                   <Button
                     className="font-bold btn-primary"
                     onClick={handleVerify}
-                    disabled={isVerified || loading} // Disable button if verified or loading
+                    disabled={isVerified || loading}
                   >
                     {loading
                       ? "Processing..."
@@ -124,14 +120,13 @@ const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
                         : "Verify Profile"}
                   </Button>
                 )}
-                {/* Edit Profile Button */}
                 <ProfileUpdate />
               </div>
 
-              {/* Followers and followings count */}
+              {/* Followers and Followings Count */}
               <div className="grid grid-cols-1 text-white md:grid-cols-2 md:gap-4 lg:gap-7 font-bold py-5">
-                <h3>Followers {user?.followers?.length || 0}</h3>
-                <h3>Followings {user?.followings?.length || 0}</h3>
+                <h3>Followers: {user?.followers?.length || 0}</h3>
+                <h3>Followings: {user?.followings?.length || 0}</h3>
               </div>
             </div>
           </div>
@@ -139,12 +134,16 @@ const MyProfile: React.FC<MyProfileProps> = ({ allUsers }) => {
       </div>
 
       {/* Tab items container */}
-      <TabsComponent
-        myPosts={myPosts}
-        allUsersExceptCurrent={allUsersExceptCurrent}
-        user={user as IUser}
-        handleToggleFollowUser={handleToggleFollowUser}
-      />
+      {myPosts.length > 0 ? (
+        <TabsComponent
+          myPosts={myPosts}
+          allUsersExceptCurrent={allUsersExceptCurrent}
+          user={user as IUser}
+          handleToggleFollowUser={handleToggleFollowUser}
+        />
+      ) : (
+        <p className="text-white">No posts available</p>
+      )}
     </div>
   );
 };

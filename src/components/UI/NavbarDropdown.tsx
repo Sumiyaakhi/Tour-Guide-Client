@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Dropdown,
   DropdownItem,
@@ -11,12 +9,11 @@ import { Avatar } from "@nextui-org/avatar";
 import { logout } from "@/src/services/AuthService";
 import { useUser } from "@/src/context/user.provider";
 import Swal from "sweetalert2"; // Import SweetAlert
-import Link from "next/link";
 
 export default function NavbarDropdown() {
   const router = useRouter();
   const { user, setIsLoading: userLoading } = useUser();
-  console.log(user);
+  console.log("User data in NavbarDropdown:", user);
 
   // Route map based on user roles
   const routeMap: Record<string, string> = {
@@ -63,15 +60,11 @@ export default function NavbarDropdown() {
           My Profile
         </DropdownItem>
 
-        <>
-          {user?.role && routeMap[user.role] && (
-            <DropdownItem>
-              <Link href={routeMap[user.role]} passHref>
-                <span className="w-full">Dashboard</span>
-              </Link>
-            </DropdownItem>
-          )}
-        </>
+        <DropdownItem
+          onClick={() => handleNavigation(routeMap[user?.role as string])}
+        >
+          Dashboard
+        </DropdownItem>
 
         <DropdownItem
           onClick={handleLogout}

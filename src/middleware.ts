@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/dashboard/:page*", // Match all dashboard sub-routes
-    "/admin-dashboard/:page*", // Match all admin dashboard sub-routes
+    // "/dashboard/:page*", // Match all dashboard sub-routes
+    // "/admin-dashboard/:page*", // Match all admin dashboard sub-routes
   ],
 };
