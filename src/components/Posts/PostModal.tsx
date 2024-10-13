@@ -9,6 +9,7 @@ import Swal from "sweetalert2"; // For SweetAlert
 import { useCreatePost } from "@/src/hooks/post.hook";
 import { useUser } from "@/src/context/user.provider";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 // Dynamically import ReactQuill with SSR disabled
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -172,10 +173,12 @@ export const PostModal = ({ closeModal }: Props) => {
                     key={index}
                     className="relative  w-full rounded-xl border-2 border-dashed border-default-300 p-2"
                   >
-                    <img
+                    <Image
                       alt="item"
                       className="h-full w-full object-cover object-center rounded-md"
                       src={imageDataUrl}
+                      width={200}
+                      height={200}
                     />
                   </div>
                 ))}

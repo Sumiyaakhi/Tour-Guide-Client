@@ -27,7 +27,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setSortByUpvotes,
   categories,
   user,
-  // Destructure isAuthenticated prop
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
@@ -71,8 +70,14 @@ const FilterBar: React.FC<FilterBarProps> = ({
     <div className="flex flex-col gap-4 p-4 rounded-lg w-full bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 text-white h-auto md:h-screen">
       {/* Category Filter Dropdown */}
       <div className="flex flex-col mb-4">
-        <label className="mb-2 font-semibold md:text-2xl">Category</label>
+        <label
+          htmlFor="category-select"
+          className="mb-2 font-semibold md:text-2xl"
+        >
+          Category
+        </label>
         <Select
+          aria-labelledby="category-select" // Link to the label using id
           placeholder="All Categories"
           selectionMode="multiple"
           className="text-xl font-bold text-teal-600 rounded-none"
@@ -89,6 +94,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
       <div className="flex flex-col">
         <label className="mb-2 font-semibold md:text-2xl">Sort by</label>
         <Select
+          aria-labelledby="sort-select" // Add an aria-labelledby for sorting
           placeholder="Sort Options"
           className="text-xl font-bold text-teal-600 rounded-none"
           onChange={(e) => handleSortChange(e.target.value)}

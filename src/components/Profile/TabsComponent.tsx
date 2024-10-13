@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import PostCard from "../Posts/PostCard";
 import { HeartFilledIcon } from "../icons";
 import { IUser, TPost } from "@/src/types";
+import Image from "next/image";
 
 interface TabsComponentProps {
   myPosts: TPost[];
@@ -74,7 +75,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
                     className="follower-item flex items-center space-x-4 mb-4"
                   >
                     {/* Follower Image */}
-                    <img
+                    <Image
                       src={follower?.img || "/default-avatar.png"}
                       alt={`${follower?.name}'s profile`}
                       className="w-12 h-12 rounded-full"
@@ -117,7 +118,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
                     className="follower-item flex items-center space-x-4 mb-4"
                   >
                     {/* Follower Image */}
-                    <img
+                    <Image
                       src={following?.img || "/default-avatar.png"}
                       alt={`${following?.name}'s profile`}
                       className="w-12 h-12 rounded-full"
@@ -163,7 +164,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
                   >
                     <div className="follower-item flex items-center gap-4 mb-4">
                       {/* Follower Image */}
-                      <img
+                      <Image
                         src={Tuser?.img || "/default-avatar.png"}
                         alt={`${Tuser?.name}'s profile`}
                         className="w-12 h-12 rounded-full"

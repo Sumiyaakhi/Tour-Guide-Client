@@ -6,14 +6,12 @@ import {
   deleteComment,
   deletePost,
   getMyPosts,
-  updateComment,
   updateDecDownvote,
   updateDecUpvote,
   updateIncDownvote,
   updateIncUpvote,
   updatePost,
 } from "../services/PostApi";
-import { TPost } from "../types";
 
 // Hook to create a post
 export const useCreatePost = () => {
@@ -140,7 +138,7 @@ export const useUpdateComment = () => {
   >({
     mutationKey: ["UPDATE_COMMENT"],
     mutationFn: async ({ postId, commenter, comment }) =>
-      await updateComment(postId, commenter, comment),
+      await addOrUpdateComment(postId, commenter, comment),
     onSuccess: () => {
       toast.success("Comment updated successfully");
     },

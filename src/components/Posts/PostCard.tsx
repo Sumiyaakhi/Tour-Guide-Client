@@ -6,6 +6,7 @@ import {
   AiOutlineLike,
   AiFillLike,
   AiFillDislike,
+  AiFillFilePdf,
 } from "react-icons/ai";
 import { Divider } from "@nextui-org/divider";
 import ImageGallery from "./ImageGallery";
@@ -34,6 +35,7 @@ import {
 } from "@nextui-org/dropdown";
 import { EllipsisVertical } from "lucide-react";
 import { deletePost, updatePost } from "@/src/services/PostApi";
+import jsPDF from "jspdf";
 
 interface PostCardProps {
   post: TPost;
@@ -41,6 +43,7 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
+  console.log(post);
   const router = useRouter();
   const {
     user,
@@ -56,7 +59,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
   const [downvote, setDownvote] = useState<number>(initialDownvote);
   const [isUpvoted, setIsUpvoted] = useState<boolean>(false);
   const [isDownvoted, setIsDownvoted] = useState<boolean>(false);
-  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
   const { mutate: updateIncUpvote } = useUpvoteIncPost();
   const { mutate: updateDecUpvote } = useUpvoteDecPost();
@@ -199,7 +201,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
       {
         postId: post._id,
         comment: comment,
-        commenter: user._id,
+        commenter: LoggedInUser?._id as string,
       },
       {
         onSuccess: () => {
@@ -220,6 +222,23 @@ const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
         },
       }
     );
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text(title, 10, 10);
+
+    // Add content
+    doc.setFontSize(12);
+    doc.text(content, 10, 20);
+
+    // Optionally, add more content or images here
+
+    // Save the PDF
+    doc.save(`${title}.pdf`);
   };
 
   return (
@@ -310,7 +329,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
         <div>
           <CommentsModal
             comments={comments ?? []}
-            currentUserEmail={user?.email}
+            currentUserEmail={LoggedInUser?.email as string}
             postId={post?._id}
           />
         </div>
@@ -323,6 +342,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
             <FaShare className="w-5 h-5 cursor-pointer" />
           </Button>
         </Link>
+        <div className="flex justify-between items-center">
+          <Button
+            className="bg-white flex space-x-3 justify-center items-center"
+            onClick={generatePDF}
+          >
+            <AiFillFilePdf className="w-5 h-5 cursor-pointer" />
+            <h5 className="md:text-xl font-semibold">PDF</h5>
+          </Button>
+        </div>
       </div>
 
       {/* Comment input */}

@@ -3,41 +3,82 @@
 import React from "react";
 import Post from "@/src/components/Posts/Post";
 import { getRecentPosts } from "@/src/services/RecentPosts";
+import Filtering from "@/src/components/Posts/Filtering";
+import { TPost } from "@/src/types";
+import FilterDropdown from "@/src/components/Posts/FilterDropdownProps";
+import axiosInstance from "@/src/lib/AxiosInstance";
 
 interface NewsFeedProps {
-  searchParams?: { page?: string };
+  searchParams?: { query?: string; category?: string; page?: string };
 }
 
-const NewsFeed: React.FC<NewsFeedProps> = async ({ searchParams }) => {
-  // Get page number from query params or default to 1
-  const currentPage = searchParams?.page ? parseInt(searchParams.page) : 1;
-  const postsPerPage = 10;
+const NewsFeed = async ({ searchParams }: NewsFeedProps) => {
+  const params = new URLSearchParams(searchParams as any);
+  const searchTerm = params.get("search");
+  const userId = params.get("userId"); // Use "search" instead of "query"
+  const category = params.get("category");
 
-  // Fetch posts for the current page
-  const { data: recentPosts } = await getRecentPosts(currentPage, postsPerPage);
+  const queryParams = [];
 
+  // Add searchTerm if it exists
+  if (searchTerm) {
+    queryParams.push(`searchTerm=${encodeURIComponent(searchTerm)}`);
+  }
+
+  // Add userId if it exists
+  if (userId) {
+    queryParams.push(`user=${encodeURIComponent(userId)}`);
+  }
+
+  // Add category if it exists
+  if (category) {
+    queryParams.push(`category=${encodeURIComponent(category)}`);
+  }
+  console.log("query params ", queryParams);
+  // Join query parameters with '&' and make the API request
+  const { data } = await axiosInstance.get(`/post?${queryParams.join("&")}`);
+  const searchResults = data?.data;
+  console.log("search results", searchResults);
+  // Fetch recent posts for default display
+  const { data: recentPosts } = await getRecentPosts();
+
+  // Ensure recentPosts is typed correctly as TPost[]
+  const categories: string[] = Array.from(
+    new Set(recentPosts.map((post: TPost) => post.category as string))
+  );
+  const userNames: string[] = Array.from(
+    new Set(recentPosts.map((post: TPost) => post?.user?.name).filter(Boolean))
+  );
+  const userIds: string[] = Array.from(
+    new Set(recentPosts.map((post: TPost) => post?.user?._id))
+  );
+
+  const postsToDisplay =
+    searchTerm || userId || category ? searchResults : recentPosts;
   return (
-    <div className="min-h-screen max-w-7xl mx-auto bg-gray-100 p-6">
-      <Post posts={recentPosts} /> {/* Pass the fetched posts */}
-      {/* Add Next and Previous buttons for pagination */}
-      <div className="flex justify-between mt-4">
-        {currentPage > 1 && (
-          <a
-            href={`?page=${currentPage - 1}`}
-            className="px-4 py-2 bg-gray-300 rounded"
-          >
-            Previous Page
-          </a>
-        )}
-        {recentPosts.length === postsPerPage && (
-          <a
-            href={`?page=${currentPage + 1}`}
-            className="px-4 py-2 bg-gray-300 rounded"
-          >
-            Next Page
-          </a>
-        )}
+    <div className="min-h-screen max-w-7xl md:mt-16 mx-auto bg-gray-100 p-6">
+      {/* Large Device Filter - displayed as a sidebar */}
+      <div className="hidden md:block">
+        <Filtering
+          categories={categories}
+          userNames={userNames}
+          userIds={userIds}
+        />
       </div>
+
+      {/* Small Device Filter - managed by a client component */}
+      <div className="md:hidden mb-4">
+        <FilterDropdown categories={categories} userNames={userNames} />
+      </div>
+
+      {/* Post content */}
+      <Post
+        categories={categories}
+        userNames={userNames}
+        posts={postsToDisplay}
+
+        // recentPosts={recentPosts}
+      />
     </div>
   );
 };

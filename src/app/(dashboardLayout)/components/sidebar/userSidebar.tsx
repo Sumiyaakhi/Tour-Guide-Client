@@ -1,16 +1,8 @@
-import {
-  Car,
-  DollarSign,
-  HeartCrackIcon,
-  HeartHandshake,
-  History,
-  Home,
-} from "lucide-react";
+import { HeartHandshake, Home } from "lucide-react";
 import img from "../../../../assets/travel logo.png";
 import { usePathname } from "next/navigation";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarMenu } from "./sidebar-menu";
-import { CollapseItems } from "./collapse-items";
 import { useSidebarContext } from "../../layout/layout-context";
 import { useState } from "react";
 import Image from "next/image";
@@ -48,10 +40,9 @@ export const SidebarWrapper = () => {
           {/* Center Brand Logo */}
 
           <Image
-            className=""
+            className="h-12 w-auto" // Tailwind classes to control height and maintain aspect ratio
             src={img}
             alt="travel logo"
-            width={50}
             height={50}
           />
           <p className="md:text-xl text-teal-700 font-brand">Wayfarer World</p>
@@ -62,9 +53,15 @@ export const SidebarWrapper = () => {
           <div className="flex flex-col gap-6 mt-9 px-2">
             {/* Sidebar items */}
             <SidebarItem
-              title="Home"
+              title="Back Home"
               icon={<Home />}
               // isActive={pathname === "/dashboard"}
+              href="/"
+            />
+            <SidebarItem
+              title="Dashboard"
+              icon={<Home />}
+              isActive={pathname === "/dashboard"}
               href="/dashboard"
             />
             <SidebarMenu title="User Dashboard Route">

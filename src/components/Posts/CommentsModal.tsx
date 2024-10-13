@@ -12,11 +12,7 @@ import { Button } from "@nextui-org/button";
 import { TfiComment } from "react-icons/tfi";
 import { IComment } from "@/src/types";
 import moment from "moment";
-import {
-  useAddOrUpdateComment,
-  useDeleteComment,
-  useUpdateComment,
-} from "@/src/hooks/post.hook";
+import { useDeleteComment, useUpdateComment } from "@/src/hooks/post.hook";
 import { toast } from "sonner";
 import Image from "next/image";
 

@@ -8,7 +8,7 @@ import { BsStars } from "react-icons/bs";
 import { Avatar } from "@nextui-org/avatar";
 import { useUser } from "@/src/context/user.provider";
 import Swal from "sweetalert2";
-import { followUser, verifyUser } from "@/src/services/UserApi";
+import { verifyUser } from "@/src/services/UserApi";
 import { TPost } from "@/src/types";
 
 interface MyProfileProps {
@@ -31,12 +31,6 @@ const UserProfile: React.FC<MyProfileProps> = ({ myPosts }) => {
     try {
       const res = await verifyUser(user?._id as string);
       window.location.href = res.data.paymentSession.paymentUrl;
-
-      // After successful verification (on payment success):
-      setUser((prevUser) => ({
-        ...prevUser,
-        verified: true,
-      }));
     } catch (error) {
       console.error("Error verifying user", error);
       Swal.fire("Error", "Failed to verify user!", "error");

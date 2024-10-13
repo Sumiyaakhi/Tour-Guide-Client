@@ -2,14 +2,18 @@
 
 import axiosInstance from "@/src/lib/AxiosInstance";
 import { revalidateTag } from "next/cache";
-import { getCurrentUser } from "../AuthService";
 import envConfig from "@/src/config/envConfig";
 import { cookies } from "next/headers";
+import { getCurrentUser } from "../AuthService";
+
+// Helper to get access token
+const getToken = () => cookies().get("accessToken")?.value || null;
 
 // Create a post
 export const createPost = async (formData: FormData): Promise<any> => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    const token = getToken();
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.post("/post", formData, {
       headers: {
@@ -29,10 +33,13 @@ export const createPost = async (formData: FormData): Promise<any> => {
 // Get a single post by ID
 export const getPost = async (postId: string) => {
   try {
+    const token = getToken();
+    if (!token) throw new Error("User not authenticated");
+
     const res = await fetch(`${envConfig.baseApi}/post/${postId}`, {
       cache: "no-store",
       headers: {
-        Authorization: `Bearer ${cookies().get("accessToken")?.value}`, // Include Bearer token
+        Authorization: `Bearer ${token}`, // Include Bearer token
       },
     });
 
@@ -50,10 +57,13 @@ export const getPost = async (postId: string) => {
 // Get all posts
 export const getAllPosts = async () => {
   try {
+    const token = getToken();
+    if (!token) throw new Error("User not authenticated");
+
     const res = await fetch(`${envConfig.baseApi}/post`, {
       cache: "no-store",
       headers: {
-        Authorization: `Bearer ${cookies().get("accessToken")?.value}`, // Include Bearer token
+        Authorization: `Bearer ${token}`, // Include Bearer token
       },
     });
 
@@ -74,7 +84,8 @@ export const getMyPosts = async () => {
     const user = await getCurrentUser();
     if (!user) throw new Error("User not authenticated");
 
-    const token = cookies().get("accessToken")?.value;
+    const token = getToken();
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.get(`/post?user=${user._id}`, {
       headers: {
@@ -94,7 +105,8 @@ export const updatePost = async (
   formData: FormData
 ): Promise<any> => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    const token = getToken();
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.put(`/post/${postId}`, formData, {
       headers: {
@@ -114,7 +126,8 @@ export const updatePost = async (
 // Delete a post
 export const deletePost = async (postId: string): Promise<any> => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    const token = getToken();
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.delete(`/post/${postId}`, {
       headers: {
@@ -130,18 +143,15 @@ export const deletePost = async (postId: string): Promise<any> => {
   }
 };
 
-// Update upvote for a post
+// Increment upvote for a post
 export const updateIncUpvote = async (postId: string) => {
   try {
-    const token = cookies().get("accessToken")?.value;
-
-    if (!token) {
-      throw new Error("No token found, please log in");
-    }
+    const token = getToken();
+    if (!token) throw new Error("No token found, please log in");
 
     const { data } = await axiosInstance.put(
-      `/post/upvoteInc/${postId}`, // Ensure this route is correct
-      {}, // Payload is empty if not needed
+      `/post/upvoteInc/${postId}`,
+      {}, // No payload needed for upvote
       {
         headers: {
           Authorization: `Bearer ${token}`, // Include Bearer token
@@ -149,61 +159,23 @@ export const updateIncUpvote = async (postId: string) => {
       }
     );
 
-    console.log(data); // Log response data
     revalidateTag("post"); // Refresh the post cache after upvote
     return data;
-  } catch (error: any) {
-    console.error(
-      "Failed to upvote post",
-      error.response ? error.response.data : error
-    );
+  } catch (error) {
+    console.error("Failed to upvote post", error);
     throw new Error("Failed to upvote post");
   }
 };
 
-// Update downvote for a post
-export const updateIncDownvote = async (postId: string) => {
-  try {
-    const token = cookies().get("accessToken")?.value;
-
-    if (!token) {
-      throw new Error("No token found, please log in");
-    }
-
-    const { data } = await axiosInstance.put(
-      `/post/downvoteInc/${postId}`, // Ensure this route is correct
-      {}, // Payload is empty if not needed
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
-        },
-      }
-    );
-
-    console.log(data); // Log response data
-    revalidateTag("post"); // Refresh the post cache after upvote
-    return data;
-  } catch (error: any) {
-    console.error(
-      "Failed to downvote post",
-      error.response ? error.response.data : error
-    );
-    throw new Error("Failed to downvote post");
-  }
-};
-
-// Update upvote for a post
+// Decrement upvote for a post
 export const updateDecUpvote = async (postId: string) => {
   try {
-    const token = cookies().get("accessToken")?.value;
-
-    if (!token) {
-      throw new Error("No token found, please log in");
-    }
+    const token = getToken();
+    if (!token) throw new Error("No token found, please log in");
 
     const { data } = await axiosInstance.put(
-      `/post/upvoteDec/${postId}`, // Ensure this route is correct
-
+      `/post/upvoteDec/${postId}`,
+      {}, // No payload needed for decrement
       {
         headers: {
           Authorization: `Bearer ${token}`, // Include Bearer token
@@ -211,34 +183,59 @@ export const updateDecUpvote = async (postId: string) => {
       }
     );
 
-    console.log(data); // Log response data
-    revalidateTag("post"); // Refresh the post cache after upvote
+    revalidateTag("post"); // Refresh the post cache after decrement
     return data;
-  } catch (error: any) {
-    console.error(
-      "Failed to upvote post",
-      error.response ? error.response.data : error
-    );
-    throw new Error("Failed to upvote post");
+  } catch (error) {
+    console.error("Failed to decrement upvote", error);
+    throw new Error("Failed to decrement upvote");
   }
 };
 
-// Update downvote for a post
-export const updateDecDownvote = async (postId: string) => {
+// Increment downvote for a post
+export const updateIncDownvote = async (postId: string) => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    const token = getToken();
+    if (!token) throw new Error("No token found, please log in");
 
-    const { data } = await axiosInstance.put(`/post/downvoteDec/${postId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Include Bearer token
-      },
-    });
-    console.log("downvote", data);
-    revalidateTag("post");
+    const { data } = await axiosInstance.put(
+      `/post/downvoteInc/${postId}`,
+      {}, // No payload needed for downvote
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include Bearer token
+        },
+      }
+    );
+
+    revalidateTag("post"); // Refresh the post cache after downvote
     return data;
   } catch (error) {
     console.error("Failed to downvote post", error);
     throw new Error("Failed to downvote post");
+  }
+};
+
+// Decrement downvote for a post
+export const updateDecDownvote = async (postId: string) => {
+  try {
+    const token = getToken();
+    if (!token) throw new Error("No token found, please log in");
+
+    const { data } = await axiosInstance.put(
+      `/post/downvoteDec/${postId}`,
+      {}, // No payload needed for decrement
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include Bearer token
+        },
+      }
+    );
+
+    revalidateTag("post"); // Refresh the post cache after decrement
+    return data;
+  } catch (error) {
+    console.error("Failed to decrement downvote", error);
+    throw new Error("Failed to decrement downvote");
   }
 };
 
@@ -249,7 +246,8 @@ export const addOrUpdateComment = async (
   commenter: string
 ) => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    const token = getToken();
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.put(
       `/post/comment/${postId}`,
@@ -272,37 +270,11 @@ export const addOrUpdateComment = async (
   }
 };
 
-// Update a specific comment on a post
-export const updateComment = async (
-  postId: string,
-  commenter: string,
-  comment: string
-) => {
-  try {
-    const token = cookies().get("accessToken")?.value;
-
-    const { data } = await axiosInstance.put(
-      `/post/${postId}/comment/${commenter}`,
-      { comment },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
-        },
-      }
-    );
-
-    revalidateTag("post"); // Refresh the post cache after comment update
-    return data;
-  } catch (error) {
-    console.error("Failed to update comment", error);
-    throw new Error("Failed to update comment");
-  }
-};
-
-// Delete a specific comment on a post
+// Delete a comment on a post
 export const deleteComment = async (postId: string, commentId: string) => {
   try {
-    const token = cookies().get("accessToken")?.value;
+    const token = getToken();
+    if (!token) throw new Error("User not authenticated");
 
     const { data } = await axiosInstance.delete(
       `/post/${postId}/comment/${commentId}`,

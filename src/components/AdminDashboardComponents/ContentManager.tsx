@@ -5,7 +5,7 @@ import { Avatar } from "@nextui-org/avatar";
 import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/card";
 import React from "react";
 import ImageGallery from "../Posts/ImageGallery";
-import { Trash, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { deletePost } from "@/src/services/PostApi";
 import Swal from "sweetalert2";
 

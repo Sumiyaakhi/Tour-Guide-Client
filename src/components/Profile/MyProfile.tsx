@@ -16,6 +16,17 @@ interface MyProfileProps {
   myPosts: TPost[];
   allUsers: IUser[];
 }
+interface TUser {
+  _id: string;
+  name: string;
+  email: string;
+  bio?: string;
+  verified: boolean;
+  followings: string[];
+  followers: string[];
+  img?: string;
+  [key: string]: any; // Allow other dynamic fields if needed
+}
 
 const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
   const { user, setUser } = useUser();
@@ -40,12 +51,6 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
       const response = await followUser(targetUserId, user?._id as string);
       const { currentUser, message } = response;
 
-      // Update user followings
-      setUser((prevUser) => ({
-        ...prevUser,
-        followings: currentUser.followings,
-      }));
-
       Swal.fire("Success", message, "success");
     } catch (error) {
       console.error("Error toggling follow/unfollow", error);
@@ -60,17 +65,6 @@ const MyProfile: React.FC<MyProfileProps> = ({ myPosts, allUsers }) => {
     try {
       const res = await verifyUser(user?._id as string);
       window.location.href = res.data.paymentSession.paymentUrl;
-
-      // After successful verification (on payment success):
-      setUser((prevUser: IUser | any) => {
-        if (prevUser) {
-          return {
-            ...prevUser,
-            verified: true, // Modify only if prevUser exists
-          };
-        }
-        return prevUser; // Return null or whatever the previous state was
-      });
     } catch (error) {
       console.error("Error verifying user", error);
       Swal.fire("Error", "Failed to verify user!", "error");

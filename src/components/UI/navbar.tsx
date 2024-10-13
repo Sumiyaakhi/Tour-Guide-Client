@@ -19,7 +19,6 @@ import img from "../../assets/travel logo.png";
 import { Button } from "@nextui-org/button";
 import { useUser } from "@/src/context/user.provider";
 import NavbarDropdown from "./NavbarDropdown";
-import { ThemeSwitch } from "../theme-switch";
 
 export const Navbar = () => {
   const { user } = useUser();
@@ -51,7 +50,12 @@ export const Navbar = () => {
       <NavbarContent className="flex justify-center items-center basis-full lg:basis-auto">
         <NavbarBrand as="li" className="md:gap-3 max-w-fit">
           <NextLink className="flex items-center md:gap-2" href="/">
-            <Image src={img} alt="travel logo" width={50} height={50} />
+            <Image
+              className="h-12 w-auto" // Tailwind classes to control height and maintain aspect ratio
+              src={img}
+              alt="travel logo"
+              height={50}
+            />
             <p className="md:text-2xl text-white font-brand">Wayfarer World</p>
           </NextLink>
         </NavbarBrand>

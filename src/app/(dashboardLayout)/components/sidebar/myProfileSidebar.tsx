@@ -1,14 +1,10 @@
-import { Tooltip } from "@nextui-org/tooltip";
-import { CollapseItems } from "./collapse-items";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarMenu } from "./sidebar-menu";
 import img from "../../../../assets/travel logo.png";
 import { usePathname } from "next/navigation";
-import { Avatar } from "@nextui-org/avatar";
 import { ContainerIcon, HandCoins, Home, User } from "lucide-react";
 import { useSidebarContext } from "../../layout/layout-context";
 import Image from "next/image";
-import { FaMoneyCheck } from "react-icons/fa";
 
 export const AdminSidebarWrapper = () => {
   const pathname = usePathname();
@@ -31,10 +27,9 @@ export const AdminSidebarWrapper = () => {
           {/* Center Brand Logo */}
 
           <Image
-            className=""
+            className="h-12 w-auto" // Tailwind classes to control height and maintain aspect ratio
             src={img}
             alt="travel logo"
-            width={50}
             height={50}
           />
           <p className="md:text-xl text-teal-500 font-brand">Wayfarer World</p>
@@ -45,7 +40,13 @@ export const AdminSidebarWrapper = () => {
           <div className="flex flex-col gap-6 mt-9 px-2">
             {/* Sidebar Items */}
             <SidebarItem
-              title="Home"
+              title="Back Home"
+              icon={<Home />}
+              isActive={pathname === "/"}
+              href="/"
+            />
+            <SidebarItem
+              title="Dashboard"
               icon={<Home />}
               isActive={pathname === "/admin-dashboard"}
               href="/admin-dashboard"

@@ -2,18 +2,9 @@
 
 import { FC, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Avatar, Divider, Button } from "@nextui-org/react";
-import {
-  AiFillDislike,
-  AiFillLike,
-  AiOutlineDislike,
-  AiOutlineLike,
-} from "react-icons/ai";
-import { FaShare } from "react-icons/fa";
+import { Avatar, Button } from "@nextui-org/react";
 import { motion } from "framer-motion";
 import ImageGallery from "./ImageGallery";
-import CommentsModal from "./CommentsModal";
-import Link from "next/link";
 import Swal from "sweetalert2";
 import {
   useAddOrUpdateComment,

@@ -18,17 +18,6 @@ const UserFollowings = () => {
       const response = await followUser(targetUserId, user?._id as string);
       const { currentUser, message } = response;
 
-      setUser((prevUser: IUser | any) => {
-        if (prevUser) {
-          return {
-            ...prevUser,
-            verified: true, // Update the verified field
-          };
-        }
-
-        return prevUser; // Return null if prevUser is null
-      });
-
       Swal.fire("Success", message, "success");
     } catch (error) {
       console.error("Error toggling follow/unfollow", error);

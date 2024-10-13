@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react"; // Import Suspense
 import { useForm } from "react-hook-form";
 import { FaFacebookF, FaLinkedinIn, FaGoogle } from "react-icons/fa";
 import { motion } from "framer-motion"; // Import Framer Motion
@@ -41,7 +41,7 @@ const SignIn = () => {
         router.push("/");
       }
     }
-  }, [isPending, isSuccess]);
+  }, [isPending, isSuccess, redirect, router]);
 
   // Animation Variants
   const containerVariants = {
@@ -161,7 +161,7 @@ const SignIn = () => {
                 </Link>
 
                 <Link href="/reset-password" className="text-sm text-green-500">
-                  reset Password
+                  Reset Password
                 </Link>
               </div>
 
@@ -203,4 +203,11 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+// Wrap the SignIn component in Suspense
+const WrappedSignIn = () => (
+  <Suspense fallback={<Loading />}>
+    <SignIn />
+  </Suspense>
+);
+
+export default WrappedSignIn;

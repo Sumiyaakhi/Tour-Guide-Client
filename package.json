@@ -38,6 +38,7 @@
 		"clsx": "2.1.1",
 		"framer-motion": "~11.1.1",
 		"intl-messageformat": "^10.5.0",
+		"jspdf": "^2.5.2",
 		"jwt-decode": "^4.0.0",
 		"lightgallery": "^2.7.2",
 		"lucide-react": "^0.447.0",
@@ -53,6 +54,7 @@
 		"react-modern-drawer": "^1.4.0",
 		"react-quill": "^2.0.0",
 		"recharts": "^2.12.7",
+		"sharp": "^0.33.5",
 		"sonner": "^1.5.0",
 		"sweetalert2": "^11.14.1"
 	},

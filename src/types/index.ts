@@ -42,6 +42,7 @@ export interface IUser {
   accesstoken?: number;
   refreshToken?: number;
   createdAt?: Date;
+  [key: string]: any;
 }
 
 export interface IComment {

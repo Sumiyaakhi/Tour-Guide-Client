@@ -1,3 +1,4 @@
+import Footer from "@/src/components/UI/Footer";
 import { Navbar } from "@/src/components/UI/navbar";
 
 export default function RootLayout({
@@ -9,6 +10,7 @@ export default function RootLayout({
     <div className="relative flex flex-col h-screen">
       <Navbar />
       <main className="  flex-grow">{children}</main>
+      <Footer />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft, Menu, SearchCheck } from "lucide-react";
+import { ChevronLeft, Menu } from "lucide-react";
 import { UserDropdown } from "./user-dropdown";
 import { Navbar, NavbarContent } from "@nextui-org/navbar";
 import { useSidebarContext } from "../../../layout/layout-context";
