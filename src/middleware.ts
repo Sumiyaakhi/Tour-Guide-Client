@@ -8,13 +8,6 @@ const authRoutes = ["/login", "/register"];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  console.log(pathname, "pathname");
-
-  //pathname , acessToken
-
-  //pathname = admin-dashboard -> accessToken = admin -> admin-dashboard &&
-  //pathname = admin-dashboard -> accessToken = user -> home page
-
   const accessToken = cookies().get("accessToken")?.value;
 
   if (!accessToken) {
@@ -38,12 +31,7 @@ export async function middleware(request: NextRequest) {
 
   decodedToken = jwtDecode(accessToken) as any;
 
-  console.log(decodedToken, "decodedToken");
-
   const role = decodedToken?.role;
-
-  console.log(role, "role");
-  console.log(pathname, "pathname");
 
   // /admin-dashboard - ok
   // /admin-dashboard/car-management - ok

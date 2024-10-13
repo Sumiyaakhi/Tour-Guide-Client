@@ -19,10 +19,7 @@ const ContactForm: React.FC = () => {
     formState: { errors },
   } = useForm<FormData>();
 
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    console.log(data);
-    // Handle form submission, send data to backend or display success message
-  };
+  const onSubmit: SubmitHandler<FormData> = (data) => {};
 
   return (
     <div className="bg-gray-100 min-h-screen px-4 mt-28 font-body">

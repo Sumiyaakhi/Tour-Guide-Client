@@ -43,7 +43,6 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, isAuthenticated }) => {
-  console.log(post);
   const router = useRouter();
   const {
     user,

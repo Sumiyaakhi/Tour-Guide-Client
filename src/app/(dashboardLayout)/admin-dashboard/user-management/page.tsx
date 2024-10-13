@@ -6,9 +6,7 @@ import React from "react";
 
 const UserManager = async () => {
   const res: any = await axiosInstance.get(`/auth/users`);
-  // console.log("my post data", myPosts); // Log the posts to check if they are being fetched
   const allUsers = res.data.data;
-  // console.log("all user data", data);
   return (
     <div>
       <UserManagement allUsers={allUsers} />

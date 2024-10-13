@@ -79,7 +79,6 @@ export const PostModal = ({ closeModal }: Props) => {
       imageFiles.forEach((imageFile) => {
         formData.append("postImages", imageFile);
       });
-      console.log(formData);
       // Submit the form data
       createPost(formData);
 

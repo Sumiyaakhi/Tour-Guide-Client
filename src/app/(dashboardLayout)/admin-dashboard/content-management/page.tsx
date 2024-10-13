@@ -8,7 +8,6 @@ import React from "react";
 const ContentmanagerPage = async () => {
   // Await the result of the async function
   const { data: posts } = await getAllPosts();
-  //   console.log("These are posts:", posts);
 
   return (
     <div className="m-5">

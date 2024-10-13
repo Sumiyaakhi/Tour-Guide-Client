@@ -10,7 +10,6 @@ const PostDetailPage = async ({ params }: { params: { postId: string } }) => {
   });
 
   const data = res.data.data;
-  console.log(data);
 
   return (
     <div className="mt-20">

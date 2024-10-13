@@ -33,7 +33,6 @@ const CommentsModal = ({
   const { mutate: updateComment } = useUpdateComment();
   const { mutate: deleteComment } = useDeleteComment();
 
-  // console.log(comments);
   const openEditModal = (comment: IComment) => {
     setCommentToEdit(comment);
     setNewComment(comment.comment); // Set initial comment for editing
@@ -51,7 +50,6 @@ const CommentsModal = ({
       { postId, commentId },
       {
         onSuccess: () => {
-          // console.log(`Deleted comment with id: ${commentId}`);
           toast.success("Comment deleted successfully!");
         },
         onError: (error: any) => {

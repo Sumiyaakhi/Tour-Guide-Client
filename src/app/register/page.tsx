@@ -47,7 +47,6 @@ const Register = () => {
   });
 
   const onSubmit = (data: FormData) => {
-    console.log("Registered Data:", data);
     handleUserRegistration(data);
     userLoading(true);
     // Send data to your backend or API here

@@ -8,11 +8,13 @@ import { Button } from "@nextui-org/button";
 interface FilterDropdownProps {
   categories: string[];
   userNames: string[];
+  userIds: string[];
 }
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({
   categories,
   userNames,
+  userIds,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -31,7 +33,11 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
       </Button>
       {isDropdownOpen && (
         <div className="bg-white shadow-md rounded-lg p-4 mt-2">
-          <Filtering categories={categories} userNames={userNames} />
+          <Filtering
+            categories={categories}
+            userNames={userNames}
+            userIds={userIds}
+          />
         </div>
       )}
     </div>

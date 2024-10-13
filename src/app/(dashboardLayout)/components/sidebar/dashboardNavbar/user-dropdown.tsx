@@ -30,10 +30,7 @@ export const UserDropdown = () => {
           <Avatar as="button" color="secondary" size="md" src={user?.img} />
         </DropdownTrigger>
       </NavbarItem>
-      <DropdownMenu
-        aria-label="User menu actions"
-        onAction={(actionKey) => console.log({ actionKey })}
-      >
+      <DropdownMenu aria-label="User menu actions">
         <DropdownItem
           key="profile"
           className="flex flex-col justify-start w-full items-start"

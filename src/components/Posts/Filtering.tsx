@@ -91,13 +91,11 @@ const Filtering = ({
       setSearchResults(data?.data?.hits ?? []);
     }
   }, [isPending, isSuccess, data, searchTerm]);
-  console.log(categories);
 
   const handleCategoryChange = (selectedCategories: Set<string> | string[]) => {
     const categories = Array.from(selectedCategories).join(","); // Joining values into a string
     updateSearchParams("category", categories);
     setCategoryFilter(categories);
-    console.log(categories); // Check the categories value here
   };
 
   const handleUserChange = (selectedUsers: Set<string> | string[]) => {

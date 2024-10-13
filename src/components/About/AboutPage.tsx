@@ -8,7 +8,6 @@ const AboutPage: React.FC = () => {
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = (data: any) => {
-    console.log(data);
     reset(); // Reset form after submission
   };
 

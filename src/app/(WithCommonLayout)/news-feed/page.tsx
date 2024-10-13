@@ -34,11 +34,9 @@ const NewsFeed = async ({ searchParams }: NewsFeedProps) => {
   if (category) {
     queryParams.push(`category=${encodeURIComponent(category)}`);
   }
-  console.log("query params ", queryParams);
   // Join query parameters with '&' and make the API request
   const { data } = await axiosInstance.get(`/post?${queryParams.join("&")}`);
   const searchResults = data?.data;
-  console.log("search results", searchResults);
   // Fetch recent posts for default display
   const { data: recentPosts } = await getRecentPosts();
 
@@ -68,7 +66,11 @@ const NewsFeed = async ({ searchParams }: NewsFeedProps) => {
 
       {/* Small Device Filter - managed by a client component */}
       <div className="md:hidden mb-4">
-        <FilterDropdown categories={categories} userNames={userNames} />
+        <FilterDropdown
+          categories={categories}
+          userNames={userNames}
+          userIds={userIds}
+        />
       </div>
 
       {/* Post content */}
